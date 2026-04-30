@@ -706,8 +706,38 @@ watch(
   max-width: 220px !important;
 }
 
+:deep(.video-model-dropdown-popover .n-popover__content) {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 10px !important;
+  padding: 6px !important;
+}
+
+:deep(.video-model-dropdown-menu) {
+  background: transparent !important;
+}
+
+:deep(.video-model-dropdown-menu .n-dropdown-option) {
+  color: var(--text-primary) !important;
+}
+
 :deep(.video-model-dropdown-menu .n-dropdown-option-body) {
   max-width: 200px;
+  border-radius: 8px;
+  color: var(--text-primary) !important;
+}
+
+:deep(.video-model-dropdown-menu .n-dropdown-option-body:hover),
+:deep(.video-model-dropdown-menu .n-dropdown-option-body--pending) {
+  background: var(--bg-tertiary) !important;
+}
+
+:deep(.video-model-dropdown-menu .n-dropdown-option-body--active) {
+  background: color-mix(in srgb, var(--accent-color) 20%, transparent) !important;
+}
+
+:deep(.video-model-dropdown-menu .n-dropdown-option--disabled) {
+  opacity: 0.55;
 }
 
 :deep(.video-model-dropdown-menu .n-dropdown-option-body__label) {
