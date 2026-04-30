@@ -7,6 +7,20 @@ import axios from 'axios'
 
 // Base URL from environment or default
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.chatfire.site'
+const pickRunpodKeyByUrl = (url = '') => {
+  let modelKeys = {}
+  try {
+    const raw = localStorage.getItem('runpod-model-api-keys')
+    modelKeys = raw ? JSON.parse(raw) : {}
+  } catch (e) {
+    modelKeys = {}
+  }
+  const normalized = String(url || '').toLowerCase()
+  const match = normalized.match(/\/v2\/([^/]+)\//)
+  if (!match) return ''
+  const endpointSlug = match[1]
+  return modelKeys[endpointSlug] || ''
+}
 
 // Create axios instance | 创建 axios 实例
 const instance = axios.create({
@@ -34,7 +48,12 @@ instance.interceptors.request.use(
     const noAuthEndpoints = ['/model/page', '/model/fullName', '/model/types']
     const isNoAuth = noAuthEndpoints.some(ep => config.url?.includes(ep))
 
-    if (apiKey && !isNoAuth) {
+    const runpodKey = pickRunpodKeyByUrl(config.url)
+    const finalApiKey = runpodKey || apiKey
+
+    if (finalApiKey && !isNoAuth) {
+      config.headers['Authorization'] = `Bearer ${finalApiKey}`
+    } else if (apiKey && !isNoAuth) {
       config.headers['Authorization'] = `Bearer ${apiKey}`
     }
 

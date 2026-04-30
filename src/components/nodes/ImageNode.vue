@@ -13,8 +13,8 @@
               v-if="!isEditingLabel"
               @dblclick="startEditLabel"
               class="text-sm font-medium text-[var(--text-primary)] cursor-text hover:bg-[var(--bg-tertiary)] px-1 rounded transition-colors"
-              title="双击编辑名称"
-            >{{ data.label || '图像生成结果' }}</span>
+              title="Klik dua kali untuk mengubah nama"
+            >{{ data.label || 'Hasil gambar' }}</span>
             <input
               v-else
               ref="labelInputRef"
@@ -29,7 +29,7 @@
               <template #trigger>
                 <button
                   class="flex items-center"
-                  title="设置公开（可被 @ 引用）"
+                  title="Jadikan publik agar bisa dipanggil dengan @"
                 >
                   <n-switch
                     :value="isPublic"
@@ -38,7 +38,7 @@
                   />
                 </button>
               </template>
-              {{ isPublic ? '已公开: ' + (data.label || '图片') : '点击公开（可被 @ 引用）' }}
+              {{ isPublic ? 'Publik: ' + (data.label || 'Gambar') : 'Klik untuk menjadikan gambar ini publik' }}
             </n-tooltip>
           </div>
           <div class="flex items-center gap-1">
@@ -51,7 +51,7 @@
                   </n-icon>
                 </button>
               </template>
-              替换图片
+              Ganti gambar
             </n-tooltip>
             <n-tooltip v-if="data.url" trigger="hover">
               <template #trigger>
@@ -61,7 +61,7 @@
                   </n-icon>
                 </button>
               </template>
-              预览
+              Pratinjau
             </n-tooltip>
             <n-tooltip v-if="data.url" trigger="hover">
               <template #trigger>
@@ -71,7 +71,7 @@
                   </n-icon>
                 </button>
               </template>
-              下载
+              Unduh
             </n-tooltip>
             <n-tooltip trigger="hover">
               <template #trigger>
@@ -81,7 +81,7 @@
                   </n-icon>
                 </button>
               </template>
-              复制节点
+              Duplikat node
             </n-tooltip>
             <n-tooltip trigger="hover">
               <template #trigger>
@@ -91,7 +91,7 @@
                   </n-icon>
                 </button>
               </template>
-              删除节点
+              Hapus node
             </n-tooltip>
           </div>
         </div>
@@ -116,7 +116,7 @@
             <img src="../../assets/loading.webp" alt="Loading" class="w-14 h-12" />
           </div>
 
-          <span class="text-sm text-white font-medium relative z-10">创作中</span>
+          <span class="text-sm text-white font-medium relative z-10">Sedang dibuat</span>
         </div>
 
         <!-- Error state | 错误状态 -->
@@ -131,7 +131,7 @@
         <!-- Image display | 图片显示 -->
         <div 
           v-else-if="data.url" 
-          class="rounded-xl overflow-hidden relative" 
+          class="rounded-xl overflow-hidden relative cursor-zoom-in" 
           ref="imageContainerRef"
         >
           <img 
@@ -139,6 +139,7 @@
             :alt="data.label" 
             class="w-full h-auto object-cover"
             :class="{ 'pointer-events-none': isInpaintMode }"
+            @click="handlePreview"
           />
           
           <!-- Inpaint canvas with events | 涂抹画布（带事件） -->
@@ -174,7 +175,7 @@
             <!-- Mode indicator | 模式指示 -->
             <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 pr-1.5 border-r border-gray-200 dark:border-gray-600">
               <n-icon :size="12"><BrushOutline /></n-icon>
-              <span>擦除</span>
+              <span>Hapus area</span>
             </div>
             
             <!-- Size slider | 大小滑块 -->
@@ -194,7 +195,7 @@
             <button 
               @click="clearMask"
               class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-              title="清除"
+              title="Bersihkan mask"
             >
               <n-icon :size="12" class="text-gray-400"><RefreshOutline /></n-icon>
             </button>
@@ -204,7 +205,7 @@
               @click="applyInpaint"
               class="px-2 py-0.5 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded transition-colors"
             >
-              应用
+              Terapkan
             </button>
           </div>
         </div>
@@ -216,7 +217,7 @@
           <div class="relative z-10">
             <img src="../../assets/loading.webp" alt="Loading" class="w-14 h-12" />
           </div>
-          <span class="text-sm text-white font-medium relative z-10">加载中...</span>
+          <span class="text-sm text-white font-medium relative z-10">Memuat...</span>
         </div>
 
         <!-- Upload placeholder | 上传占位 -->
@@ -226,7 +227,7 @@
             <n-icon :size="32" class="text-[var(--text-secondary)]">
               <ImageOutline />
             </n-icon>
-            <span class="text-sm text-[var(--text-secondary)] text-center">拖放图片或点击上传</span>
+            <span class="text-sm text-[var(--text-secondary)] text-center">Seret gambar ke sini atau klik untuk unggah</span>
             <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer"
               @change="handleFileUpload" />
           </div>
@@ -243,7 +244,7 @@
             <input 
               v-model="urlInput"
               type="text" 
-              placeholder="输入图片地址..."
+              placeholder="Masukkan tautan gambar..."
               class="flex-1 px-2 py-1 text-sm bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg outline-none focus:border-[var(--accent-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
               @keydown.enter="handleUrlSubmit"
             />
@@ -252,7 +253,7 @@
               :disabled="!urlInput.trim()"
               class="px-3 py-2 text-xs bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             >
-              预览
+              Tampilkan
             </button>
           </div>
         </div>
@@ -264,14 +265,20 @@
     </div>
   </div>
 
-  <!-- Image preview dialog | 图片预览弹窗 -->
-  <n-image-preview
-    v-model:show="showRef"
-    :src="props.data?.url"
-  />
+  <!-- Image preview dialog (boxed, not fullscreen) -->
+  <n-modal v-model:show="showRef" preset="card" title="Pratinjau gambar" class="w-[720px] max-w-[92vw]" :mask-closable="true">
+    <div class="flex items-center justify-center bg-[var(--bg-tertiary)] rounded-lg p-2">
+      <img
+        v-if="props.data?.url"
+        :src="props.data.url"
+        :alt="props.data?.label || 'Preview'"
+        class="max-h-[70vh] w-auto h-auto object-contain rounded"
+      />
+    </div>
+  </n-modal>
 
   <!-- Replace image modal | 替换图片弹窗 -->
-  <n-modal v-model:show="showReplaceModal" preset="card" title="替换图片" class="w-[400px]" :mask-closable="true">
+  <n-modal v-model:show="showReplaceModal" preset="card" title="Ganti gambar" class="w-[400px]" :mask-closable="true">
     <div class="space-y-4">
       <!-- Upload area | 上传区域 -->
       <div
@@ -282,7 +289,7 @@
           <n-icon :size="32" class="text-[var(--text-secondary)]">
             <ImageOutline />
           </n-icon>
-          <span class="text-sm text-[var(--text-secondary)]">点击上传图片</span>
+          <span class="text-sm text-[var(--text-secondary)]">Klik untuk unggah gambar</span>
           <input
             ref="replaceFileInputRef"
             type="file"
@@ -305,12 +312,12 @@
         <input
           v-model="replaceUrlInput"
           type="text"
-          placeholder="输入图片地址..."
+          placeholder="Masukkan tautan gambar..."
           class="flex-1 px-3 py-2 text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg outline-none focus:border-[var(--accent-color)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
           @keydown.enter="handleReplaceUrlSubmit"
         />
         <n-button type="primary" size="small" :disabled="!replaceUrlInput.trim()" @click="handleReplaceUrlSubmit">
-          确认
+          Gunakan
         </n-button>
       </div>
     </div>
@@ -375,7 +382,7 @@ const isPublic = computed(() => {
 const handleTogglePublic = (value) => {
   if (value) {
     // 公开：使用节点名称
-    const name = props.data?.label || '图片'
+    const name = props.data?.label || 'Gambar'
     updateNode(props.id, {
       publicProps: { name }
     })
@@ -389,8 +396,8 @@ const handleTogglePublic = (value) => {
 
 // Image node menu operations | 图片节点菜单操作
 const operations = [
-  { type: 'imageConfig', label: '图生图', icon: ImageOutline, action: 'image_imageConfig' },
-  { type: 'videoConfig', label: '生视频', icon: VideocamOutline, action: 'image_videoConfig' }
+  { type: 'imageConfig', label: 'Gambar ke gambar', icon: ImageOutline, action: 'image_imageConfig' },
+  { type: 'videoConfig', label: 'Buat video', icon: VideocamOutline, action: 'image_videoConfig' }
 ]
 
 // Handle menu select | 处理菜单选择
@@ -405,21 +412,21 @@ const handleSelect = (item) => {
     const sourceUrl = currentNode?.data?.url
 
     if (!sourceUrl) {
-      window.$message?.warning('当前图片节点没有图片')
+      window.$message?.warning('Node gambar ini belum memiliki gambar')
       return
     }
 
     // Create text node for prompt
     const textNodeId = addNode('text', { x: nodeX + 300, y: nodeY - 100 }, {
       content: '',
-      label: '提示词'
+      label: 'Prompt'
     })
 
     // Create imageConfig node
     const configNodeId = addNode('imageConfig', { x: nodeX + 900, y: nodeY }, {
       model: 'doubao-seedream-4-5-251128',
       size: '2048x2048',
-      label: '生图配置'
+      label: 'Konfigurasi gambar'
     })
 
     // Connect edges
@@ -427,7 +434,7 @@ const handleSelect = (item) => {
     addEdge({ source: textNodeId, target: configNodeId, sourceHandle: 'right', targetHandle: 'left' })
 
     setTimeout(() => updateNodeInternals([textNodeId, configNodeId]), 50)
-    window.$message?.success('已创建图生图工作流')
+    window.$message?.success('Workflow gambar ke gambar berhasil dibuat')
   } else if (action === 'image_videoConfig') {
     // Video generation workflow | 视频生成工作流
     const currentNode = nodes.value.find(n => n.id === props.id)
@@ -437,12 +444,12 @@ const handleSelect = (item) => {
     // Create text node for prompt
     const textNodeId = addNode('text', { x: nodeX + 300, y: nodeY - 100 }, {
       content: '',
-      label: '提示词'
+      label: 'Prompt'
     })
 
     // Create videoConfig node
     const configNodeId = addNode('videoConfig', { x: nodeX + 600, y: nodeY }, {
-      label: '视频生成'
+      label: 'Pembuatan video'
     })
 
     // Connect image to videoConfig
@@ -464,7 +471,7 @@ const handleSelect = (item) => {
     })
 
     setTimeout(() => updateNodeInternals([textNodeId, configNodeId]), 50)
-    window.$message?.success('已创建视频生成工作流')
+    window.$message?.success('Workflow pembuatan video berhasil dibuat')
   }
 }
 
@@ -555,7 +562,7 @@ const clearMask = () => {
 const applyInpaint = () => {
   const canvas = canvasRef.value
   if (!canvas || canvas.width === 0 || canvas.height === 0) {
-    window.$message?.error('画布未初始化')
+    window.$message?.error('Kanvas belum siap')
     return
   }
   
@@ -563,7 +570,7 @@ const applyInpaint = () => {
   const container = imageContainerRef.value
   const img = container?.querySelector('img')
   if (!img) {
-    window.$message?.error('未找到图片')
+    window.$message?.error('Gambar tidak ditemukan')
     return
   }
   
@@ -620,8 +627,8 @@ const createInpaintWorkflow = () => {
   
   // Create text node for prompt | 创建文本节点用于提示词
   const textNodeId = addNode('text', { x: nodeX + 300, y: nodeY - 100 }, {
-    content: '请输入重绘提示词...',
-    label: '重绘提示词'
+    content: 'Masukkan prompt untuk area yang ingin diperbaiki...',
+    label: 'Prompt inpaint'
   })
   
   // Create imageConfig node for inpainting | 创建图生图配置节点
@@ -662,7 +669,7 @@ const createInpaintWorkflow = () => {
     updateNodeInternals([textNodeId, configNodeId])
   }, 50)
   
-  window.$message?.success('已创建局部重绘工作流')
+    window.$message?.success('Workflow inpaint berhasil dibuat')
 }
 
 // Convert file to base64 | 将文件转换为 base64
@@ -688,12 +695,12 @@ const handleFileUpload = async (event) => {
         base64: base64,  // Store base64 for API calls | 存储 base64 用于 API 调用
         fileName: file.name,
         fileType: file.type,
-        label: '参考图',
+        label: 'Gambar referensi',
         updatedAt: Date.now()
       })
     } catch (err) {
       console.error('File upload error:', err)
-      window.$message?.error('图片上传失败')
+      window.$message?.error('Gagal mengunggah gambar')
     }
   }
 }
@@ -705,7 +712,7 @@ const handleUrlSubmit = () => {
   
   // Validate URL format | 验证 URL 格式
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    window.$message?.warning('请输入有效的图片地址 (http:// 或 https://)')
+    window.$message?.warning('Masukkan tautan gambar yang valid, diawali http:// atau https://')
     return
   }
   
@@ -718,14 +725,14 @@ const handleUrlSubmit = () => {
     // Update node with URL | 更新节点 URL
     updateNode(props.id, {
       url: url,
-      label: '网络图片',
+      label: 'Gambar dari tautan',
       updatedAt: Date.now()
     })
     urlInput.value = ''
     urlLoading.value = false
   }
   img.onerror = () => {
-    window.$message?.error('图片加载失败，请检查地址是否正确')
+    window.$message?.error('Gagal memuat gambar. Periksa kembali tautannya.')
     urlLoading.value = false
   }
   img.src = url
@@ -744,15 +751,15 @@ const handleReplaceFileUpload = async (event) => {
         base64: base64,
         fileName: file.name,
         fileType: file.type,
-        label: '参考图',
+        label: 'Gambar referensi',
         updatedAt: Date.now()
       })
       showReplaceModal.value = false
       replaceUrlInput.value = ''
-      window.$message?.success('图片已替换')
+      window.$message?.success('Gambar berhasil diganti')
     } catch (err) {
       console.error('File upload error:', err)
-      window.$message?.error('图片上传失败')
+      window.$message?.error('Gagal mengunggah gambar')
     }
   }
 }
@@ -763,7 +770,7 @@ const handleReplaceUrlSubmit = () => {
   if (!url) return
 
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    window.$message?.warning('请输入有效的图片地址 (http:// 或 https://)')
+    window.$message?.warning('Masukkan tautan gambar yang valid, diawali http:// atau https://')
     return
   }
 
@@ -771,22 +778,22 @@ const handleReplaceUrlSubmit = () => {
   img.onload = () => {
     updateNode(props.id, {
       url: url,
-      label: '网络图片',
+      label: 'Gambar dari tautan',
       updatedAt: Date.now()
     })
     showReplaceModal.value = false
     replaceUrlInput.value = ''
-    window.$message?.success('图片已替换')
+    window.$message?.success('Gambar berhasil diganti')
   }
   img.onerror = () => {
-    window.$message?.error('图片加载失败，请检查地址是否正确')
+    window.$message?.error('Gagal memuat gambar. Periksa kembali tautannya.')
   }
   img.src = url
 }
 
 // Start editing label | 开始编辑 label
 const startEditLabel = () => {
-  editingLabelValue.value = props.data?.label || '图像生成结果'
+  editingLabelValue.value = props.data?.label || 'Hasil gambar'
   isEditingLabel.value = true
   nextTick(() => {
     labelInputRef.value?.focus()
@@ -820,7 +827,7 @@ const handleDuplicate = () => {
     // Clear selection and select the new node | 清除选中并选中新节点
     updateNode(props.id, { selected: false })
     updateNode(newId, { selected: true })
-    window.$message?.success('节点已复制')
+    window.$message?.success('Node berhasil diduplikasi')
     setTimeout(() => {
       updateNodeInternals(newId)
     }, 50)
@@ -836,13 +843,13 @@ const handleImageGen = () => {
   // Create text node for prompt | 创建文本节点用于提示词
   const textNodeId = addNode('text', { x: nodeX + 300, y: nodeY - 100 }, {
     content: '',
-    label: '提示词'
+    label: 'Prompt'
   })
 
   // Create ImageNode for editing | 创建图片编辑节点
   const imageNodeId = addNode('image', { x: nodeX + 600, y: nodeY }, {
     url: props.data.url,  // Pass the current image as input
-    label: '图生图',
+    label: 'Gambar ke gambar',
     refImage: props.data.url  // Mark as reference image
   })
 
@@ -850,7 +857,7 @@ const handleImageGen = () => {
   const configNodeId = addNode('imageConfig', { x: nodeX + 900, y: nodeY }, {
     model: 'doubao-seedream-4-5-251128',
     size: '2048x2048',
-    label: '生图配置'
+    label: 'Konfigurasi gambar'
   })
 
   // Connect image node to new image node | 连接当前图片节点到新图片节点
@@ -882,7 +889,7 @@ const handleImageGen = () => {
     updateNodeInternals([textNodeId, imageNodeId, configNodeId])
   }, 50)
 
-  window.$message?.success('已创建图生图工作流')
+  window.$message?.success('Workflow gambar ke gambar berhasil dibuat')
 }
 
 // Preview state | 预览状态
@@ -904,7 +911,7 @@ const handleDownload = () => {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    window.$message?.success('图片下载中...')
+    window.$message?.success('Unduhan gambar dimulai')
   }
 }
 
@@ -917,12 +924,12 @@ const handleVideoGen = () => {
   // Create text node for prompt | 创建文本节点用于提示词
   const textNodeId = addNode('text', { x: nodeX + 300, y: nodeY - 100 }, {
     content: '',
-    label: '提示词'
+    label: 'Prompt'
   })
 
   // Create videoConfig node | 创建视频配置节点
   const configNodeId = addNode('videoConfig', { x: nodeX + 600, y: nodeY }, {
-    label: '视频生成'
+    label: 'Pembuatan video'
   })
 
   // Connect image node to config node with role | 连接图片节点到配置节点并设置角色

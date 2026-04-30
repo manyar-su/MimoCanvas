@@ -53,11 +53,11 @@ const props = defineProps({
 
 // Order labels | 顺序标签
 const orderLabels = [
-  { label: '① 第一张', key: 1 },
-  { label: '② 第二张', key: 2 },
-  { label: '③ 第三张', key: 3 },
-  { label: '④ 第四张', key: 4 },
-  { label: '⑤ 第五张', key: 5 }
+  { label: '① Gambar pertama', key: 1 },
+  { label: '② Gambar kedua', key: 2 },
+  { label: '③ Gambar ketiga', key: 3 },
+  { label: '④ Gambar keempat', key: 4 },
+  { label: '⑤ Gambar kelima', key: 5 }
 ]
 
 // Dynamic order options based on connected edges count + @ mentioned images | 基于连接边数量和@提及图片的动态顺序选项

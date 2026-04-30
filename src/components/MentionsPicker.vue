@@ -14,7 +14,7 @@
       <div class="mentions-search" v-if="showSearch">
         <n-input
           v-model:value="searchQuery"
-          placeholder="搜索节点..."
+          placeholder="Cari node..."
           size="small"
           :autofocus="true"
           @keydown="handleKeydown"
@@ -43,14 +43,14 @@
           <div class="mentions-item-content">
             <div class="mentions-item-label">
               <!-- ImageNode 优先显示 publicProps.name -->
-              {{ node.type === 'image' ? (node.data?.publicProps?.name || node.data?.label || '未命名') : (node.data?.label || node.id) }}
+              {{ node.type === 'image' ? (node.data?.publicProps?.name || node.data?.label || 'Tanpa nama') : (node.data?.label || node.id) }}
             </div>
             <div class="mentions-item-id">{{ node.id }}</div>
           </div>
         </div>
       </div>
       <div class="mentions-empty" v-else>
-        <span>没有可引用的节点</span>
+        <span>Tidak ada node yang bisa dirujuk</span>
       </div>
     </div>
   </n-popover>

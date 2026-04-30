@@ -1,80 +1,79 @@
-# huobao-canvas Docker 部署指南
+# Panduan Deployment Docker mimo-canvas
 
-## 快速开始
+## Mulai Cepat
 
-### 方式一：从 Docker Hub 拉取
+### Metode 1: Tarik dari Docker Hub
 
 ```bash
-docker pull peigen666/huobao-canvas:latest
-docker run -d -p 8080:80 --name huobao-canvas peigen666/huobao-canvas:latest
+docker pull peigen666/mimo-canvas:latest
+docker run -d -p 8080:80 --name mimo-canvas peigen666/mimo-canvas:latest
 ```
 
-访问：http://localhost:8080/huobao-canvas/
+Akses: `http://localhost:8080/mimo-canvas/`
 
-
-### 方式二：本地构建
+### Metode 2: Build Lokal
 
 ```bash
-# 1. 构建前端
+# 1. Build frontend
 pnpm install
 pnpm build
 
-# 2. 构建 Docker 镜像
-docker build -t huobao-canvas .
+# 2. Build image Docker
+docker build -t mimo-canvas .
 
-# 3. 运行容器
-docker run -d -p 8080:80 --name huobao-canvas huobao-canvas
+# 3. Jalankan container
+docker run -d -p 8080:80 --name mimo-canvas mimo-canvas
 ```
 
-## 常用命令
+## Perintah Umum
 
 ```bash
-# 停止容器
-docker stop huobao-canvas
+# Hentikan container
+docker stop mimo-canvas
 
-# 启动容器
-docker start huobao-canvas
+# Jalankan container
+docker start mimo-canvas
 
-# 删除容器
-docker rm huobao-canvas
+# Hapus container
+docker rm mimo-canvas
 
-# 查看日志
-docker logs huobao-canvas
+# Lihat log
+docker logs mimo-canvas
 
-# 进入容器
-docker exec -it huobao-canvas sh
+# Masuk ke container
+docker exec -it mimo-canvas sh
 ```
 
-## 配置说明
+## Penjelasan Konfigurasi
 
-### 端口映射
+### Pemetaan Port
 
-默认映射 `8080:80`，可修改宿主机端口：
+Pemetaan default adalah `8080:80`. Anda bisa mengganti port host:
 
 ```bash
-docker run -d -p 3000:80 --name huobao-canvas peigen666/huobao-canvas:latest
+docker run -d -p 3000:80 --name mimo-canvas peigen666/mimo-canvas:latest
 ```
 
-### Nginx 配置
+### Konfigurasi Nginx
 
-- 静态文件路径：`/usr/share/nginx/html/huobao-canvas`
-- API 代理：`/v1` → `https://api.chatfire.site`
-- Gzip 压缩：已启用
-- 静态资源缓存：1 年
+- Path file statis: `/usr/share/nginx/html/mimo-canvas`
+- Proxy API: `/v1` → `https://api.chatfire.site`
+- Kompresi Gzip: aktif
+- Cache aset statis: 1 tahun
 
-## 推送镜像
+## Push Image
 
 ```bash
-# 登录 Docker Hub
+# Login ke Docker Hub
 docker login
 
-# 构建并推送
-docker build -t peigen666/huobao-canvas:latest .
-docker push peigen666/huobao-canvas:latest
+# Build dan push
+docker build -t peigen666/mimo-canvas:latest .
+docker push peigen666/mimo-canvas:latest
 ```
 
-## 注意事项
+## Catatan
 
-1. 确保 `dist/` 目录已存在（先运行 `pnpm build`）
-2. 避免使用浏览器屏蔽的端口（如 6666、6667、6668）
-3. 访问路径需带 `/huobao-canvas` 后缀
+1. Pastikan direktori `dist/` sudah ada dengan menjalankan `pnpm build` terlebih dahulu.
+2. Hindari port yang diblokir browser seperti `6666`, `6667`, dan `6668`.
+3. Gunakan path akses `/mimo-canvas` saat deployment.

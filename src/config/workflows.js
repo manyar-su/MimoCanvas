@@ -1,92 +1,116 @@
-/**
- * Workflow Templates Configuration | 工作流模板配置
- * 预设工作流模板，支持一键添加到画布
- */
 import workflowCover1 from '@/assets/workflow01.jpeg'
 import workflowCover2 from '@/assets/workflow02.jpeg'
-
+import product01 from '@/assets/product01.jpg'
 import scene01 from '@/assets/scene01.jpeg'
 import shot01 from '@/assets/shot01.jpeg'
 
-// Multi-angle prompts | 多角度提示词模板
 export const MULTI_ANGLE_PROMPTS = {
   front: {
-    label: '正视',
+    label: 'Tampak depan',
     english: 'Front View',
-    prompt: (character) => `使用提供的图片，生成四宫格分镜，每张四宫格包括人物正面对着镜头的4个景别（远景、中景、近景、和局部特写），保持场景、产品、人物特征的一致性，宫格里的每一张照片保持和提供图片相同的比例。并在图片下方用英文标注这个景别
+    prompt: (character) => `Gunakan gambar referensi yang terhubung untuk membuat storyboard empat panel dari karakter yang sama.
 
-角色参考: ${character}`
+Setiap panel harus menampilkan sudut pandang depan dengan variasi jarak kamera:
+1. Long shot
+2. Medium shot
+3. Close up
+4. Extreme close up
+
+Pastikan wajah, kostum, proporsi tubuh, warna, dan suasana tetap konsisten dengan referensi. Pertahankan rasio gambar yang sama dengan referensi. Tulis label sudut pengambilan dalam bahasa Inggris di bawah setiap panel.
+
+Deskripsi karakter:
+${character || 'Isi detail karakter di sini.'}`
   },
   side: {
-    label: '侧视',
-    english: 'Side View', 
-    prompt: (character) => `使用提供的图片，分别生成四宫格分镜，每张四宫格包括人物侧面角度的4个景别（远景、中景、近景、和局部特写），保持场景、产品、人物特征的一致性，宫格里的每一张照片保持和提供图片相同的比例。并在图片下方用英文标注这个景别
+    label: 'Tampak samping',
+    english: 'Side View',
+    prompt: (character) => `Gunakan gambar referensi yang terhubung untuk membuat storyboard empat panel dari karakter yang sama.
 
-角色参考: ${character}`
+Setiap panel harus menampilkan sudut pandang samping dengan variasi jarak kamera:
+1. Long shot
+2. Medium shot
+3. Close up
+4. Extreme close up
+
+Pastikan bentuk wajah, rambut, kostum, proporsi, dan pencahayaan tetap konsisten dengan referensi. Pertahankan rasio gambar yang sama dengan referensi. Tulis label sudut pengambilan dalam bahasa Inggris di bawah setiap panel.
+
+Deskripsi karakter:
+${character || 'Isi detail karakter di sini.'}`
   },
   back: {
-    label: '后视',
+    label: 'Tampak belakang',
     english: 'Back View',
-    prompt: (character) => `使用提供的图片，分别生成四宫格分镜，每张四宫格包括人物背影角度的4个景别（远景、中景、近景、和局部特写），保持场景、产品、人物特征的一致性，宫格里的每一张照片保持和提供图片相同的比例。并在图片下方用英文标注这个景别
+    prompt: (character) => `Gunakan gambar referensi yang terhubung untuk membuat storyboard empat panel dari karakter yang sama.
 
-角色参考: ${character}`
+Setiap panel harus menampilkan sudut pandang belakang dengan variasi jarak kamera:
+1. Long shot
+2. Medium shot
+3. Close up
+4. Extreme close up
+
+Pastikan siluet, kostum, proporsi, dan suasana tetap konsisten dengan referensi. Pertahankan rasio gambar yang sama dengan referensi. Tulis label sudut pengambilan dalam bahasa Inggris di bawah setiap panel.
+
+Deskripsi karakter:
+${character || 'Isi detail karakter di sini.'}`
   },
   top: {
-    label: '俯视',
-    english: 'Top/Bird\'s Eye View',
-    prompt: (character) => `使用提供的图片，分别生成四宫格分镜，每张四宫格包括俯视角度的4个景别（远景、中景、近景、和局部特写），保持场景、产品、人物特征的一致性，宫格里的每一张照片保持和提供图片相同的比例。并在图片下方用英文标注这个景别
+    label: 'Tampak atas',
+    english: "Bird's Eye View",
+    prompt: (character) => `Gunakan gambar referensi yang terhubung untuk membuat storyboard empat panel dari karakter yang sama.
 
-角色参考: ${character}`
+Setiap panel harus menampilkan sudut pandang atas dengan variasi jarak kamera:
+1. Long shot
+2. Medium shot
+3. Close up
+4. Extreme close up
+
+Pastikan pose, kostum, warna, dan lingkungan tetap konsisten dengan referensi. Pertahankan rasio gambar yang sama dengan referensi. Tulis label sudut pengambilan dalam bahasa Inggris di bawah setiap panel.
+
+Deskripsi karakter:
+${character || 'Isi detail karakter di sini.'}`
   }
 }
 
-/**
- * Workflow Templates | 工作流模板
- */
 export const WORKFLOW_TEMPLATES = [
   {
     id: 'multi-angle-storyboard',
-    name: '多角度分镜',
-    description: '生成角色的正视、侧视、后视、俯视四宫格分镜图',
+    name: 'Storyboard multi-sudut',
+    description: 'Membuat empat prompt storyboard karakter dari sudut depan, samping, belakang, dan atas.',
     icon: 'GridOutline',
     category: 'storyboard',
     cover: workflowCover1,
-    // 节点配置
     createNodes: (startPosition) => {
       const nodeSpacing = 400
       const rowSpacing = 280
       const angles = ['front', 'side', 'back', 'top']
-      
       const nodes = []
       const edges = []
       let nodeIdCounter = 0
       const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
-      
-      // 主角色图：提示词 + 文生图配置
+
       const characterTextId = getNodeId()
       nodes.push({
         id: characterTextId,
         type: 'text',
         position: { x: startPosition.x, y: startPosition.y + rowSpacing * 1.5 },
         data: {
-          content: '',
-          label: '角色提示词'
+          content: 'Karakter utama: perempuan muda bergaya fantasi, rambut perak panjang, mantel biru tua, membawa tongkat bercahaya, ekspresi tenang dan percaya diri.',
+          label: 'Deskripsi karakter'
         }
       })
-      
+
       const characterConfigId = getNodeId()
       nodes.push({
         id: characterConfigId,
         type: 'imageConfig',
         position: { x: startPosition.x + nodeSpacing, y: startPosition.y + rowSpacing * 1.5 },
         data: {
-          label: '主角色图',
-          model: 'doubao-seedream-4-5-251128',
+          label: 'Buat karakter utama',
+          model: 'wan-2-6-t2i',
           size: '2048x2048'
         }
       })
-      
-      // 主角色图结果节点（空白图片节点）
+
       const characterImageId = getNodeId()
       nodes.push({
         id: characterImageId,
@@ -94,11 +118,10 @@ export const WORKFLOW_TEMPLATES = [
         position: { x: startPosition.x + nodeSpacing * 2, y: startPosition.y + rowSpacing * 1.5 },
         data: {
           url: '',
-          label: '角色图结果'
+          label: 'Hasil karakter utama'
         }
       })
-      
-      // 连线：角色提示词 → 角色图配置
+
       edges.push({
         id: `edge_${characterTextId}_${characterConfigId}`,
         source: characterTextId,
@@ -106,8 +129,7 @@ export const WORKFLOW_TEMPLATES = [
         sourceHandle: 'right',
         targetHandle: 'left'
       })
-      
-      // 连线：角色图配置 → 角色图结果
+
       edges.push({
         id: `edge_${characterConfigId}_${characterImageId}`,
         source: characterConfigId,
@@ -115,42 +137,36 @@ export const WORKFLOW_TEMPLATES = [
         sourceHandle: 'right',
         targetHandle: 'left'
       })
-      
-      // 创建4个角度的节点
+
       const angleX = startPosition.x + nodeSpacing * 3 + 100
-      
+
       angles.forEach((angleKey, index) => {
         const angleConfig = MULTI_ANGLE_PROMPTS[angleKey]
         const angleY = startPosition.y + index * rowSpacing
-        let currentX = angleX
-        
-        // 提示词节点（预填充默认提示词）
+
         const textNodeId = getNodeId()
         nodes.push({
           id: textNodeId,
           type: 'text',
-          position: { x: currentX, y: angleY },
+          position: { x: angleX, y: angleY },
           data: {
             content: angleConfig.prompt(''),
-            label: `${angleConfig.label}提示词`
+            label: `Prompt ${angleConfig.label.toLowerCase()}`
           }
         })
-        currentX += nodeSpacing
-        
-        // 图片配置节点
+
         const configNodeId = getNodeId()
         nodes.push({
           id: configNodeId,
           type: 'imageConfig',
-          position: { x: currentX, y: angleY },
+          position: { x: angleX + nodeSpacing, y: angleY },
           data: {
             label: `${angleConfig.label} (${angleConfig.english})`,
-            model: 'doubao-seedream-4-5-251128',
+            model: 'wan-2-6-t2i',
             size: '2048x2048'
           }
         })
-        
-        // 连线：提示词 → 配置
+
         edges.push({
           id: `edge_${textNodeId}_${configNodeId}`,
           source: textNodeId,
@@ -160,8 +176,7 @@ export const WORKFLOW_TEMPLATES = [
           sourceHandle: 'right',
           targetHandle: 'left'
         })
-        
-        // 连线：角色图结果 → 角度配置（参考图）
+
         edges.push({
           id: `edge_${characterImageId}_${configNodeId}`,
           source: characterImageId,
@@ -172,1065 +187,598 @@ export const WORKFLOW_TEMPLATES = [
           targetHandle: 'left'
         })
       })
-      
+
       return { nodes, edges }
     }
   },
   {
     id: 'product-ecommerce-full-set',
-    name: '通用产品全套电商图',
-    description: '根据产品信息和图片，生成模特图、侧面展示图、俯瞰展示图',
+    name: 'Paket visual e-commerce produk',
+    description: 'Menyusun foto model, tampak samping, tampak atas, dan ilustrasi eksploded untuk satu produk.',
     icon: 'ShoppingOutline',
     category: 'ecommerce',
     cover: workflowCover2,
-    // 节点配置
     createNodes: (startPosition) => {
-      const colSpacing = 500  // 列间距
-      const rowSpacing = 350  // 行间距
-      
+      const colSpacing = 500
+      const rowSpacing = 350
       const nodes = []
       const edges = []
       let nodeIdCounter = 0
       const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
-      
-      // ========== 布局说明 ==========
-      // 第一列: A(产品信息), B(产品图片) - 输入节点
-      // 第二列: C, D, E - 提示词节点
-      // 第三列: 生成模特图, 侧面展示图, 俯瞰展示图 - 输出节点
-      
-      // ========== 第一列：输入节点 ==========
-      // A: 产品信息文本节点
-      const nodeA_productInfoId = getNodeId()
+
+      const productInfoId = getNodeId()
       nodes.push({
-        id: nodeA_productInfoId,
+        id: productInfoId,
         type: 'text',
         position: { x: startPosition.x, y: startPosition.y },
         data: {
-          content: 'Soundcore by Anker P20i真无线耳机，10mm驱动单元带来强劲低音，蓝牙5.3，30小时超长续航，防水，2个麦克风实现AI清晰通话，22种预设均衡器，可通过App定制 强劲低音：Soundcore P20i真无线耳机搭载超大10mm驱动单元，带来强劲音效和增强的低音，让您沉浸在喜爱的歌曲中。 个性化聆听体验：使用Soundcore App自定义控制选项，并从22种预设均衡器中进行选择。借助“Find My Earbuds”（查找我的耳机）功能，丢失的耳机可以发出声音，帮助您定位。 长续航，快速充电：单次充电可提供10小时电池续航，搭配充电盒则可延长至30小时。如果P20i真无线耳机电量不足，仅需10分钟快速充电即可提供2小时播放时间。 便携式设计：Soundcore P20i真无线耳机和充电盒小巧轻便，配有挂绳。其体积足够小，可轻松放入口袋，或挂在包或钥匙上，让您无需担心空间问题。 AI增强清晰通话：2个内置麦克风和AI算法协同工作，捕捉您的声音，让您无需在电话中大喊大叫。',
-          label: '产品信息'
+          content: `Produk: Earbud nirkabel Soundcore P20i.
+
+Poin utama:
+- Driver 10 mm dengan bass kuat
+- Bluetooth 5.3
+- Total pemakaian hingga 30 jam
+- Tahan cipratan air
+- Dua mikrofon dengan bantuan AI untuk panggilan lebih jernih
+- Tersedia pengaturan equalizer melalui aplikasi
+
+Gaya visual yang diinginkan:
+- Bersih, premium, modern
+- Cocok untuk katalog marketplace
+- Warna tetap setia ke produk asli`,
+          label: 'Informasi produk'
         }
       })
-      
-      // B: 产品图片节点
-      const nodeB_productImageId = getNodeId()
+
+      const productImageId = getNodeId()
       nodes.push({
-        id: nodeB_productImageId,
+        id: productImageId,
         type: 'image',
         position: { x: startPosition.x, y: startPosition.y + rowSpacing },
         data: {
-          url: 'https://ffile.chatfire.site/image/covers/product01.jpg',
-          label: '产品图片'
+          url: product01,
+          label: 'Foto produk'
         }
       })
-      
-      // ========== 第二列：提示词节点 ==========
-      // C: 模特图提示词 (与生成模特图对齐)
-      const nodeC_modelPromptId = getNodeId()
+
+      const modelPromptId = getNodeId()
       nodes.push({
-        id: nodeC_modelPromptId,
+        id: modelPromptId,
         type: 'text',
         position: { x: startPosition.x + colSpacing, y: startPosition.y },
         data: {
-          content: '根据产品特性，生成一个适合展示该产品且时尚富有高级感的模特图，彩色人像，背景是白底，人物居中，欧美人优先',
-          label: '模特图提示词'
+          content: 'Buat foto model studio yang menampilkan produk ini sedang dipakai. Model terlihat modern, percaya diri, pencahayaan halus, latar putih bersih, komposisi fokus pada produk di telinga.',
+          label: 'Prompt foto model'
         }
       })
-      
-      // D: 侧面展示图提示词 (与侧面展示图对齐)
-      const nodeD_sidePromptId = getNodeId()
-      nodes.push({
-        id: nodeD_sidePromptId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing },
-        data: {
-          content: '根据产品图和产品信息，生成左侧侧面45度的展示图，高清展示侧面的产品形状和细节，保持产品不变形',
-          label: '侧面展示图提示词'
-        }
-      })
-      
-      // E: 俯瞰展示图提示词 (与俯瞰展示图对齐)
-      const nodeE_topPromptId = getNodeId()
-      nodes.push({
-        id: nodeE_topPromptId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing * 2 },
-        data: {
-          content: '根据产品图和产品信息，生成从上往下俯瞰的产品展示图，高清展示俯瞰角度的产品形状和细节，保持产品不变形',
-          label: '俯瞰展示图提示词'
-        }
-      })
-      
-      // F: 拆解图提示词 (与拆解图对齐)
-      const nodeF_explodedPromptId = getNodeId()
-      nodes.push({
-        id: nodeF_explodedPromptId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing * 3 },
-        data: {
-          content: '根据产品材质功能，生成一张产品核心部件的结构示意图，要展现出产品核心部件的内部构造，画面清晰呈现产品关键部件，背景为简洁的浅色调，同时包含核心卖点文案',
-          label: '拆解图提示词'
-        }
-      })
-      
-      // ========== 第三列：生成节点 ==========
-      // B+C = 生成模特图
-      const modelConfigId = getNodeId()
-      nodes.push({
-        id: modelConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 2, y: startPosition.y },
-        data: {
-          label: '生成模特图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2048x2048'
-        }
-      })
-      
-      // B+D = 生成侧面展示图
-      const sideConfigId = getNodeId()
-      nodes.push({
-        id: sideConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 2, y: startPosition.y + rowSpacing },
-        data: {
-          label: '侧面展示图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2048x2048'
-        }
-      })
-      
-      // B+E = 生成俯瞰展示图
-      const topConfigId = getNodeId()
-      nodes.push({
-        id: topConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 2, y: startPosition.y + rowSpacing * 2 },
-        data: {
-          label: '俯瞰展示图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2048x2048'
-        }
-      })
-      
-      // AB+F = 生成拆解图
-      const explodedConfigId = getNodeId()
-      nodes.push({
-        id: explodedConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 2, y: startPosition.y + rowSpacing * 3 },
-        data: {
-          label: '拆解图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2048x2048'
-        }
-      })
-      
-      // ========== 连线 ==========
-      // AB+C → 生成模特图
-      edges.push({
-        id: `edge_${nodeA_productInfoId}_${modelConfigId}`,
-        source: nodeA_productInfoId,
-        target: modelConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nodeB_productImageId}_${modelConfigId}`,
-        source: nodeB_productImageId,
-        target: modelConfigId,
-        type: 'imageOrder',
-        data: { imageOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nodeC_modelPromptId}_${modelConfigId}`,
-        source: nodeC_modelPromptId,
-        target: modelConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 2 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
-      // AB+D → 生成侧面展示图
-      edges.push({
-        id: `edge_${nodeA_productInfoId}_${sideConfigId}`,
-        source: nodeA_productInfoId,
-        target: sideConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nodeB_productImageId}_${sideConfigId}`,
-        source: nodeB_productImageId,
-        target: sideConfigId,
-        type: 'imageOrder',
-        data: { imageOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nodeD_sidePromptId}_${sideConfigId}`,
-        source: nodeD_sidePromptId,
-        target: sideConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 2 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
-      // AB+E → 生成俯瞰展示图
-      edges.push({
-        id: `edge_${nodeA_productInfoId}_${topConfigId}`,
-        source: nodeA_productInfoId,
-        target: topConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nodeB_productImageId}_${topConfigId}`,
-        source: nodeB_productImageId,
-        target: topConfigId,
-        type: 'imageOrder',
-        data: { imageOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nodeE_topPromptId}_${topConfigId}`,
-        source: nodeE_topPromptId,
-        target: topConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 2 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
-      // AB+F → 生成拆解图
-      edges.push({
-        id: `edge_${nodeA_productInfoId}_${explodedConfigId}`,
-        source: nodeA_productInfoId,
-        target: explodedConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nodeB_productImageId}_${explodedConfigId}`,
-        source: nodeB_productImageId,
-        target: explodedConfigId,
-        type: 'imageOrder',
-        data: { imageOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nodeF_explodedPromptId}_${explodedConfigId}`,
-        source: nodeF_explodedPromptId,
-        target: explodedConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 2 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
-      return { nodes, edges }
-    }
-  },
-  // ========== 短剧生图工作流 ==========
-  {
-    id: 'drama-character-design',
-    name: '短剧角色设计',
-    description: '根据角色描述生成一致性角色形象，后续多角度图依赖正面图保持一致性',
-    icon: 'PersonOutline',
-    category: 'drama',
-    cover: shot01,
-    createNodes: (startPosition) => {
-      const colSpacing = 400
-      const rowSpacing = 280
-      
-      const nodes = []
-      const edges = []
-      let nodeIdCounter = 0
-      const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
-      
-      // ========== 第一阶段：生成正面角色图 ==========
-      // 角色描述
-      const characterDescId = getNodeId()
-      nodes.push({
-        id: characterDescId,
-        type: 'text',
-        position: { x: startPosition.x, y: startPosition.y },
-        data: {
-          content: '角色名称：林小雨\n性别：女\n年龄：22岁\n外貌特征：长发及腰，眼睛明亮有神，皮肤白皙，身材高挑\n服装风格：现代都市风，白色连衣裙\n性格特点：温柔善良，内心坚强',
-          label: '角色描述'
-        }
-      })
-      
-      // 风格参考图（可选）
-      const styleRefId = getNodeId()
-      nodes.push({
-        id: styleRefId,
-        type: 'image',
-        position: { x: startPosition.x, y: startPosition.y + rowSpacing },
-        data: {
-          url: '',
-          label: '风格参考图（可选）'
-        }
-      })
-      
-      // 正面全身提示词
-      const frontPromptId = getNodeId()
-      nodes.push({
-        id: frontPromptId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing, y: startPosition.y },
-        data: {
-          content: '根据角色描述，生成角色的正面全身照，人物居中，白色简洁背景，高清写实风格，电影级画质',
-          label: '正面全身提示词'
-        }
-      })
-      
-      // 正面全身生成配置
-      const frontConfigId = getNodeId()
-      nodes.push({
-        id: frontConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 2, y: startPosition.y },
-        data: {
-          label: '生成正面全身图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '1440x2560'
-        }
-      })
-      
-      // 正面全身图结果（作为后续生成的参考）
-      const frontResultId = getNodeId()
-      nodes.push({
-        id: frontResultId,
-        type: 'image',
-        position: { x: startPosition.x + colSpacing * 3, y: startPosition.y },
-        data: {
-          url: '',
-          label: '正面角色图（参考基准）'
-        }
-      })
-      
-      // ========== 第二阶段：基于正面图生成多角度 ==========
-      // 侧面半身提示词
+
       const sidePromptId = getNodeId()
       nodes.push({
         id: sidePromptId,
         type: 'text',
-        position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing },
+        position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing },
         data: {
-          content: '参考提供的角色正面图，保持人物外貌、服装完全一致，生成角色的侧面半身照，45度角侧脸，展示五官轮廓，白色简洁背景，高清写实风格',
-          label: '侧面半身提示词'
+          content: 'Buat render produk sudut samping 45 derajat. Tonjolkan bentuk bodi, detail casing, dan finishing material. Jaga bentuk produk tetap akurat dan tidak berubah.',
+          label: 'Prompt tampak samping'
         }
       })
-      
-      // 表情特写提示词
-      const closeupPromptId = getNodeId()
+
+      const topPromptId = getNodeId()
       nodes.push({
-        id: closeupPromptId,
+        id: topPromptId,
         type: 'text',
-        position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing * 2 },
+        position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing * 2 },
         data: {
-          content: '参考提供的角色正面图，保持人物五官、发型完全一致，生成角色的面部特写，展示多种表情（微笑、严肃、惊讶、悲伤），四宫格布局，高清写实风格',
-          label: '表情特写提示词'
+          content: 'Buat render produk dari sudut atas. Perlihatkan susunan earbud dan casing dengan jelas, bersih, simetris, dan tetap menyerupai produk asli.',
+          label: 'Prompt tampak atas'
         }
       })
-      
-      // 背面全身提示词
-      const backPromptId = getNodeId()
+
+      const explodedPromptId = getNodeId()
       nodes.push({
-        id: backPromptId,
+        id: explodedPromptId,
         type: 'text',
-        position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing * 3 },
+        position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing * 3 },
         data: {
-          content: '参考提供的角色正面图，保持人物发型、服装、身材完全一致，生成角色的背面全身照，展示背影，白色简洁背景，高清写实风格',
-          label: '背面全身提示词'
+          content: 'Buat ilustrasi eksploded view yang menjelaskan komponen utama earbud dan casing pengisi daya. Gunakan gaya teknis yang rapi, modern, mudah dipahami, dengan callout singkat untuk fitur inti.',
+          label: 'Prompt ilustrasi eksploded'
         }
       })
-      
-      // 侧面生成配置
+
+      const modelConfigId = getNodeId()
       const sideConfigId = getNodeId()
-      nodes.push({
-        id: sideConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing },
-        data: {
-          label: '侧面半身图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2048x2048'
+      const topConfigId = getNodeId()
+      const explodedConfigId = getNodeId()
+
+      nodes.push(
+        {
+          id: modelConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 2, y: startPosition.y },
+          data: { label: 'Buat foto model', model: 'wan-2-6-t2i', size: '2048x2048' }
+        },
+        {
+          id: sideConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 2, y: startPosition.y + rowSpacing },
+          data: { label: 'Buat tampak samping', model: 'wan-2-6-t2i', size: '2048x2048' }
+        },
+        {
+          id: topConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 2, y: startPosition.y + rowSpacing * 2 },
+          data: { label: 'Buat tampak atas', model: 'wan-2-6-t2i', size: '2048x2048' }
+        },
+        {
+          id: explodedConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 2, y: startPosition.y + rowSpacing * 3 },
+          data: { label: 'Buat ilustrasi eksploded', model: 'wan-2-6-t2i', size: '2048x2048' }
         }
-      })
-      
-      // 表情特写生成配置
-      const closeupConfigId = getNodeId()
-      nodes.push({
-        id: closeupConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing * 2 },
-        data: {
-          label: '表情特写图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2048x2048'
-        }
-      })
-      
-      // 背面生成配置
-      const backConfigId = getNodeId()
-      nodes.push({
-        id: backConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing * 3 },
-        data: {
-          label: '背面全身图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '1440x2560'
-        }
-      })
-      
-      // ========== 连线：第一阶段 ==========
-      // 角色描述 → 正面生成
-      edges.push({
-        id: `edge_${characterDescId}_${frontConfigId}`,
-        source: characterDescId,
-        target: frontConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      // 风格参考 → 正面生成
-      edges.push({
-        id: `edge_${styleRefId}_${frontConfigId}`,
-        source: styleRefId,
-        target: frontConfigId,
-        type: 'imageOrder',
-        data: { imageOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      // 正面提示词 → 正面生成
-      edges.push({
-        id: `edge_${frontPromptId}_${frontConfigId}`,
-        source: frontPromptId,
-        target: frontConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 2 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      // 正面生成 → 正面结果
-      edges.push({
-        id: `edge_${frontConfigId}_${frontResultId}`,
-        source: frontConfigId,
-        target: frontResultId,
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
-      // ========== 连线：第二阶段（依赖正面图） ==========
-      // 正面结果 → 侧面生成（作为参考图）
-      edges.push({
-        id: `edge_${frontResultId}_${sideConfigId}`,
-        source: frontResultId,
-        target: sideConfigId,
-        type: 'imageOrder',
-        data: { imageOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      // 正面结果 → 表情生成（作为参考图）
-      edges.push({
-        id: `edge_${frontResultId}_${closeupConfigId}`,
-        source: frontResultId,
-        target: closeupConfigId,
-        type: 'imageOrder',
-        data: { imageOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      // 正面结果 → 背面生成（作为参考图）
-      edges.push({
-        id: `edge_${frontResultId}_${backConfigId}`,
-        source: frontResultId,
-        target: backConfigId,
-        type: 'imageOrder',
-        data: { imageOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
-      // 提示词 → 各生成节点
-      edges.push({
-        id: `edge_${sidePromptId}_${sideConfigId}`,
-        source: sidePromptId,
-        target: sideConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${closeupPromptId}_${closeupConfigId}`,
-        source: closeupPromptId,
-        target: closeupConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${backPromptId}_${backConfigId}`,
-        source: backPromptId,
-        target: backConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
-      return { nodes, edges }
-    }
-  },
-  {
-    id: 'drama-scene-background',
-    name: '多时段场景背景',
-    description: '先生成基础场景，再基于基础场景生成多时段变体，保持场景一致性',
-    icon: 'ImageOutline',
-    category: 'drama',
-    cover: scene01,
-    createNodes: (startPosition) => {
-      const colSpacing = 400
-      const rowSpacing = 260
-      
-      const nodes = []
-      const edges = []
-      let nodeIdCounter = 0
-      const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
-      
-      // ========== 第一阶段：生成基础场景 ==========
-      // 场景描述
-      const sceneDescId = getNodeId()
-      nodes.push({
-        id: sceneDescId,
-        type: 'text',
-        position: { x: startPosition.x, y: startPosition.y },
-        data: {
-          content: '场景名称：现代都市街道\n位置：繁华商业区主街道\n环境特征：高楼大厦林立，霓虹灯招牌，车水马龙\n氛围：都市繁华、现代感强\n特殊元素：咖啡店、书店、商场入口',
-          label: '场景描述'
-        }
-      })
-      
-      // 基础场景提示词
-      const basePromptId = getNodeId()
-      nodes.push({
-        id: basePromptId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing, y: startPosition.y },
-        data: {
-          content: '根据场景描述，生成白天正午时段的场景背景作为基准，阳光明媚，光线充足均匀，展示场景全貌和所有环境元素，纯背景无人物，电影级画质，宽屏构图',
-          label: '基础场景提示词'
-        }
-      })
-      
-      // 基础场景生成配置
-      const baseConfigId = getNodeId()
-      nodes.push({
-        id: baseConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 2, y: startPosition.y },
-        data: {
-          label: '生成基础场景',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2560x1440'
-        }
-      })
-      
-      // 基础场景结果（作为后续生成的参考）
-      const baseResultId = getNodeId()
-      nodes.push({
-        id: baseResultId,
-        type: 'image',
-        position: { x: startPosition.x + colSpacing * 3, y: startPosition.y },
-        data: {
-          url: '',
-          label: '基础场景图（参考基准）'
-        }
-      })
-      
-      // ========== 第二阶段：基于基础场景生成多时段变体 ==========
-      // 傍晚场景提示词
-      const eveningPromptId = getNodeId()
-      nodes.push({
-        id: eveningPromptId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing },
-        data: {
-          content: '参考提供的基础场景图，保持场景构图、建筑、环境元素完全一致，仅改变光照为傍晚时段：夕阳西下，天空呈橙红色渐变，光线柔和温暖，建筑投射长影',
-          label: '傍晚场景提示词'
-        }
-      })
-      
-      // 夜晚场景提示词
-      const nightPromptId = getNodeId()
-      nodes.push({
-        id: nightPromptId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing * 2 },
-        data: {
-          content: '参考提供的基础场景图，保持场景构图、建筑、环境元素完全一致，仅改变光照为夜晚时段：霓虹灯亮起，城市灯光璀璨，天空深蓝或黑色，窗户透出暖光',
-          label: '夜晚场景提示词'
-        }
-      })
-      
-      // 雨天场景提示词
-      const rainPromptId = getNodeId()
-      nodes.push({
-        id: rainPromptId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing * 3 },
-        data: {
-          content: '参考提供的基础场景图，保持场景构图、建筑、环境元素完全一致，仅改变天气为雨天：细雨绵绵，地面湿润有倒影，天空阴沉灰暗，氛围忧郁',
-          label: '雨天场景提示词'
-        }
-      })
-      
-      // 傍晚生成配置
-      const eveningConfigId = getNodeId()
-      nodes.push({
-        id: eveningConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing },
-        data: {
-          label: '傍晚场景',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2560x1440'
-        }
-      })
-      
-      // 夜晚生成配置
-      const nightConfigId = getNodeId()
-      nodes.push({
-        id: nightConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing * 2 },
-        data: {
-          label: '夜晚场景',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2560x1440'
-        }
-      })
-      
-      // 雨天生成配置
-      const rainConfigId = getNodeId()
-      nodes.push({
-        id: rainConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing * 3 },
-        data: {
-          label: '雨天场景',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2560x1440'
-        }
-      })
-      
-      // ========== 连线：第一阶段 ==========
-      // 场景描述 → 基础场景生成
-      edges.push({
-        id: `edge_${sceneDescId}_${baseConfigId}`,
-        source: sceneDescId,
-        target: baseConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      // 基础提示词 → 基础场景生成
-      edges.push({
-        id: `edge_${basePromptId}_${baseConfigId}`,
-        source: basePromptId,
-        target: baseConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 2 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      // 基础场景生成 → 基础场景结果
-      edges.push({
-        id: `edge_${baseConfigId}_${baseResultId}`,
-        source: baseConfigId,
-        target: baseResultId,
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
-      // ========== 连线：第二阶段（依赖基础场景图） ==========
-      // 基础场景结果 → 各时段生成（作为参考图）
-      const variantConfigs = [eveningConfigId, nightConfigId, rainConfigId]
-      variantConfigs.forEach(configId => {
+      )
+
+      const promptLinks = [
+        [productInfoId, modelConfigId, 1],
+        [modelPromptId, modelConfigId, 2],
+        [productInfoId, sideConfigId, 1],
+        [sidePromptId, sideConfigId, 2],
+        [productInfoId, topConfigId, 1],
+        [topPromptId, topConfigId, 2],
+        [productInfoId, explodedConfigId, 1],
+        [explodedPromptId, explodedConfigId, 2]
+      ]
+
+      promptLinks.forEach(([source, target, promptOrder]) => {
         edges.push({
-          id: `edge_${baseResultId}_${configId}`,
-          source: baseResultId,
-          target: configId,
+          id: `edge_${source}_${target}`,
+          source,
+          target,
+          type: 'promptOrder',
+          data: { promptOrder },
+          sourceHandle: 'right',
+          targetHandle: 'left'
+        })
+      })
+
+      ;[modelConfigId, sideConfigId, topConfigId, explodedConfigId].forEach((target) => {
+        edges.push({
+          id: `edge_${productImageId}_${target}`,
+          source: productImageId,
+          target,
           type: 'imageOrder',
           data: { imageOrder: 1 },
           sourceHandle: 'right',
           targetHandle: 'left'
         })
       })
-      
-      // 提示词 → 各生成节点
-      edges.push({
-        id: `edge_${eveningPromptId}_${eveningConfigId}`,
-        source: eveningPromptId,
-        target: eveningConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${nightPromptId}_${nightConfigId}`,
-        source: nightPromptId,
-        target: nightConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      edges.push({
-        id: `edge_${rainPromptId}_${rainConfigId}`,
-        source: rainPromptId,
-        target: rainConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-      
+
       return { nodes, edges }
     }
   },
-  // {
-  //   id: 'drama-storyboard-shot',
-  //   name: '短剧分镜图',
-  //   description: '根据角色、场景和剧情描述生成分镜画面',
-  //   icon: 'FilmOutline',
-  //   category: 'drama',
-  //   cover: workflowCover1,
-  //   createNodes: (startPosition) => {
-  //     const colSpacing = 400
-  //     const rowSpacing = 250
-      
-  //     const nodes = []
-  //     const edges = []
-  //     let nodeIdCounter = 0
-  //     const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
-      
-  //     // ========== 输入节点 ==========
-  //     // 角色参考图
-  //     const characterRefId = getNodeId()
-  //     nodes.push({
-  //       id: characterRefId,
-  //       type: 'image',
-  //       position: { x: startPosition.x, y: startPosition.y },
-  //       data: {
-  //         url: '',
-  //         label: '角色参考图'
-  //       }
-  //     })
-      
-  //     // 场景背景图
-  //     const sceneRefId = getNodeId()
-  //     nodes.push({
-  //       id: sceneRefId,
-  //       type: 'image',
-  //       position: { x: startPosition.x, y: startPosition.y + rowSpacing },
-  //       data: {
-  //         url: '',
-  //         label: '场景背景图'
-  //       }
-  //     })
-      
-  //     // 分镜描述
-  //     const shotDescId = getNodeId()
-  //     nodes.push({
-  //       id: shotDescId,
-  //       type: 'text',
-  //       position: { x: startPosition.x, y: startPosition.y + rowSpacing * 2 },
-  //       data: {
-  //         content: '分镜编号：001\n景别：中景\n镜头角度：平视\n画面描述：女主角站在咖啡店门口，手持一杯咖啡，微微低头看着手机，若有所思\n人物动作：站立，单手持咖啡，另一手拿手机\n表情：略带忧郁，眉头微蹙\n光线：自然光，侧逆光',
-  //         label: '分镜描述'
-  //       }
-  //     })
-      
-  //     // ========== 生成提示词 ==========
-  //     const shotPromptId = getNodeId()
-  //     nodes.push({
-  //       id: shotPromptId,
-  //       type: 'text',
-  //       position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing },
-  //       data: {
-  //         content: '根据角色参考图、场景背景和分镜描述，生成电影级分镜画面，保持角色外貌一致，场景融合自然，光影效果符合描述，16:9宽屏比例，电影调色',
-  //         label: '分镜生成提示词'
-  //       }
-  //     })
-      
-  //     // ========== 生成节点 ==========
-  //     const shotConfigId = getNodeId()
-  //     nodes.push({
-  //       id: shotConfigId,
-  //       type: 'imageConfig',
-  //       position: { x: startPosition.x + colSpacing * 2, y: startPosition.y + rowSpacing },
-  //       data: {
-  //         label: '分镜画面',
-  //         model: 'doubao-seedream-4-5-251128',
-  //         size: '2560x1440'
-  //       }
-  //     })
-      
-  //     // ========== 连线 ==========
-  //     edges.push({
-  //       id: `edge_${characterRefId}_${shotConfigId}`,
-  //       source: characterRefId,
-  //       target: shotConfigId,
-  //       sourceHandle: 'right',
-  //       targetHandle: 'left'
-  //     })
-  //     edges.push({
-  //       id: `edge_${sceneRefId}_${shotConfigId}`,
-  //       source: sceneRefId,
-  //       target: shotConfigId,
-  //       sourceHandle: 'right',
-  //       targetHandle: 'left'
-  //     })
-  //     edges.push({
-  //       id: `edge_${shotDescId}_${shotConfigId}`,
-  //       source: shotDescId,
-  //       target: shotConfigId,
-  //       type: 'promptOrder',
-  //       data: { promptOrder: 1 },
-  //       sourceHandle: 'right',
-  //       targetHandle: 'left'
-  //     })
-  //     edges.push({
-  //       id: `edge_${shotPromptId}_${shotConfigId}`,
-  //       source: shotPromptId,
-  //       target: shotConfigId,
-  //       type: 'promptOrder',
-  //       data: { promptOrder: 2 },
-  //       sourceHandle: 'right',
-  //       targetHandle: 'left'
-  //     })
-      
-  //     return { nodes, edges }
-  //   }
-  // },
-  // ========== 儿童绘本工作流 ==========
   {
-    id: 'picture-book-generator',
-    name: '儿童绘本生成',
-    description: '角色生成 → 剧情文字 → 绘本插画，支持角色一致性',
-    icon: 'BookOutline',
-    category: 'creative',
-    cover: "https://ffile.chatfire.site/image/covers/workflow03.jpeg",
+    id: 'drama-character-design',
+    name: 'Desain karakter drama pendek',
+    description: 'Mengolah brief karakter menjadi prompt visual dan gambar referensi karakter.',
+    icon: 'PersonOutline',
+    category: 'drama',
+    cover: shot01,
     createNodes: (startPosition) => {
       const colSpacing = 420
-      const rowSpacing = 280
-      const pageRowSpacing = 240
-
       const nodes = []
       const edges = []
       let nodeIdCounter = 0
       const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
 
-      // ========== 第一阶段：故事输入 ==========
+      const briefId = getNodeId()
+      const llmId = getNodeId()
+      const configId = getNodeId()
+      const resultId = getNodeId()
+
+      nodes.push(
+        {
+          id: briefId,
+          type: 'text',
+          position: { x: startPosition.x, y: startPosition.y },
+          data: {
+            content: `Nama karakter: Alya
+Usia: 23 tahun
+Peran: tokoh utama drama romantis perkotaan
+Kepribadian: tenang, sensitif, pekerja keras
+Ciri visual: rambut hitam panjang, blazer krem, tote bag kulit, riasan natural
+Nuansa: realistis, sinematik, emosional`,
+            label: 'Brief karakter'
+          }
+        },
+        {
+          id: llmId,
+          type: 'llmConfig',
+          position: { x: startPosition.x + colSpacing, y: startPosition.y },
+          data: {
+            label: 'Susun prompt karakter',
+            systemPrompt: `Anda adalah perancang prompt karakter untuk drama pendek.
+
+Tugas:
+1. Ubah brief karakter menjadi satu prompt gambar yang lengkap.
+2. Jelaskan wajah, kostum, postur, ekspresi, dan suasana.
+3. Gunakan bahasa Indonesia yang jelas dan siap dipakai untuk generator gambar.
+4. Tambahkan arahan gaya realistis sinematik di akhir prompt.
+
+Kembalikan hanya prompt akhir tanpa penjelasan tambahan.`,
+            model: 'ibm-granite-4-0-h-small',
+            outputFormat: 'text'
+          }
+        },
+        {
+          id: configId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 2, y: startPosition.y },
+          data: {
+            label: 'Buat referensi karakter',
+            model: 'wan-2-6-t2i',
+            size: '2048x2048'
+          }
+        },
+        {
+          id: resultId,
+          type: 'image',
+          position: { x: startPosition.x + colSpacing * 3, y: startPosition.y },
+          data: {
+            url: '',
+            label: 'Hasil referensi karakter'
+          }
+        }
+      )
+
+      edges.push(
+        { id: `edge_${briefId}_${llmId}`, source: briefId, target: llmId, sourceHandle: 'right', targetHandle: 'left' },
+        {
+          id: `edge_${llmId}_${configId}`,
+          source: llmId,
+          target: configId,
+          type: 'promptOrder',
+          data: { promptOrder: 1 },
+          sourceHandle: 'right',
+          targetHandle: 'left'
+        },
+        { id: `edge_${configId}_${resultId}`, source: configId, target: resultId, sourceHandle: 'right', targetHandle: 'left' }
+      )
+
+      return { nodes, edges }
+    }
+  },
+  {
+    id: 'drama-scene-background',
+    name: 'Variasi latar adegan drama',
+    description: 'Membuat latar dasar lalu menurunkannya menjadi versi senja, malam, dan hujan.',
+    icon: 'ImageOutline',
+    category: 'drama',
+    cover: scene01,
+    createNodes: (startPosition) => {
+      const colSpacing = 420
+      const rowSpacing = 260
+      const nodes = []
+      const edges = []
+      let nodeIdCounter = 0
+      const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
+
+      const sceneDescId = getNodeId()
+      const basePromptId = getNodeId()
+      const baseConfigId = getNodeId()
+      const baseResultId = getNodeId()
+      const eveningPromptId = getNodeId()
+      const nightPromptId = getNodeId()
+      const rainPromptId = getNodeId()
+      const eveningConfigId = getNodeId()
+      const nightConfigId = getNodeId()
+      const rainConfigId = getNodeId()
+
+      nodes.push(
+        {
+          id: sceneDescId,
+          type: 'text',
+          position: { x: startPosition.x, y: startPosition.y },
+          data: {
+            content: `Latar utama:
+- Gang sempit kota tua dengan deretan toko kecil
+- Jalan basah sehabis dibersihkan
+- Banyak papan nama, jendela kaca, dan kabel udara
+- Kamera eye level, komposisi sinematik lebar
+- Nuansa realistis seperti still frame drama`,
+            label: 'Deskripsi latar'
+          }
+        },
+        {
+          id: basePromptId,
+          type: 'text',
+          position: { x: startPosition.x + colSpacing, y: startPosition.y },
+          data: {
+            content: 'Buat latar dasar yang realistis dan detail berdasarkan deskripsi. Tidak ada karakter. Fokus pada arsitektur, kedalaman ruang, dan pencahayaan siang yang netral.',
+            label: 'Prompt latar dasar'
+          }
+        },
+        {
+          id: baseConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 2, y: startPosition.y },
+          data: {
+            label: 'Buat latar dasar',
+            model: 'wan-2-6-t2i',
+            size: '2560x1440'
+          }
+        },
+        {
+          id: baseResultId,
+          type: 'image',
+          position: { x: startPosition.x + colSpacing * 3, y: startPosition.y },
+          data: {
+            url: '',
+            label: 'Hasil latar dasar'
+          }
+        },
+        {
+          id: eveningPromptId,
+          type: 'text',
+          position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing },
+          data: {
+            content: 'Gunakan gambar latar dasar sebagai referensi. Pertahankan komposisi, bangunan, dan detail lokasi yang sama, lalu ubah suasana menjadi senja hangat dengan langit jingga lembut dan lampu toko mulai menyala.',
+            label: 'Prompt suasana senja'
+          }
+        },
+        {
+          id: nightPromptId,
+          type: 'text',
+          position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing * 2 },
+          data: {
+            content: 'Gunakan gambar latar dasar sebagai referensi. Pertahankan komposisi dan detail lokasi, lalu ubah menjadi malam hari dengan neon kota, lampu jendela, dan kontras warna biru gelap yang kuat.',
+            label: 'Prompt suasana malam'
+          }
+        },
+        {
+          id: rainPromptId,
+          type: 'text',
+          position: { x: startPosition.x + colSpacing * 3 + 100, y: startPosition.y + rowSpacing * 3 },
+          data: {
+            content: 'Gunakan gambar latar dasar sebagai referensi. Pertahankan komposisi dan detail lokasi, lalu ubah menjadi cuaca hujan dengan aspal basah, pantulan cahaya, langit mendung, dan atmosfer melankolis.',
+            label: 'Prompt suasana hujan'
+          }
+        },
+        {
+          id: eveningConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing },
+          data: {
+            label: 'Buat versi senja',
+            model: 'wan-2-6-t2i',
+            size: '2560x1440'
+          }
+        },
+        {
+          id: nightConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing * 2 },
+          data: {
+            label: 'Buat versi malam',
+            model: 'wan-2-6-t2i',
+            size: '2560x1440'
+          }
+        },
+        {
+          id: rainConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 4 + 100, y: startPosition.y + rowSpacing * 3 },
+          data: {
+            label: 'Buat versi hujan',
+            model: 'wan-2-6-t2i',
+            size: '2560x1440'
+          }
+        }
+      )
+
+      edges.push(
+        {
+          id: `edge_${sceneDescId}_${baseConfigId}`,
+          source: sceneDescId,
+          target: baseConfigId,
+          type: 'promptOrder',
+          data: { promptOrder: 1 },
+          sourceHandle: 'right',
+          targetHandle: 'left'
+        },
+        {
+          id: `edge_${basePromptId}_${baseConfigId}`,
+          source: basePromptId,
+          target: baseConfigId,
+          type: 'promptOrder',
+          data: { promptOrder: 2 },
+          sourceHandle: 'right',
+          targetHandle: 'left'
+        },
+        { id: `edge_${baseConfigId}_${baseResultId}`, source: baseConfigId, target: baseResultId, sourceHandle: 'right', targetHandle: 'left' }
+      )
+
+      ;[
+        [eveningPromptId, eveningConfigId],
+        [nightPromptId, nightConfigId],
+        [rainPromptId, rainConfigId]
+      ].forEach(([promptId, configId]) => {
+        edges.push(
+          {
+            id: `edge_${baseResultId}_${configId}`,
+            source: baseResultId,
+            target: configId,
+            type: 'imageOrder',
+            data: { imageOrder: 1 },
+            sourceHandle: 'right',
+            targetHandle: 'left'
+          },
+          {
+            id: `edge_${promptId}_${configId}`,
+            source: promptId,
+            target: configId,
+            type: 'promptOrder',
+            data: { promptOrder: 1 },
+            sourceHandle: 'right',
+            targetHandle: 'left'
+          }
+        )
+      })
+
+      return { nodes, edges }
+    }
+  },
+  {
+    id: 'picture-book-generator',
+    name: 'Generator buku cerita anak',
+    description: 'Menyusun karakter, naskah, dan ilustrasi buku cerita dengan gaya visual yang konsisten.',
+    icon: 'BookOutline',
+    category: 'creative',
+    cover: 'https://ffile.chatfire.site/image/covers/workflow03.jpeg',
+    createNodes: (startPosition) => {
+      const colSpacing = 420
+      const rowSpacing = 280
+      const nodes = []
+      const edges = []
+      let nodeIdCounter = 0
+      const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
+
       const storyInputId = getNodeId()
-      nodes.push({
-        id: storyInputId,
-        type: 'text',
-        position: { x: startPosition.x, y: startPosition.y },
-        data: {
-          content: `【绘本名称】小兔子的冒险之旅
-
-【故事主题】勇气与友谊
-
-【主要角色】
-1. 小白兔米米 - 主角，白色毛发，粉红色耳朵内侧，穿蓝色背带裤，性格勇敢好奇
-2. 小狐狸橙橙 - 伙伴，橙色毛发，白色尾巴尖，戴绿色围巾，聪明机智
-
-【故事梗概】
-小白兔米米住在森林边的小木屋里，有一天她发现了一张神秘的藏宝图。在好朋友小狐狸橙橙的陪伴下，她们踏上了寻宝之旅。途中遇到各种挑战，最后发现真正的宝藏是友谊和勇气。
-
-【画风要求】
-温馨治愈的水彩绘本风格，色彩明亮柔和，适合3-6岁儿童阅读`,
-          label: '故事大纲'
-        }
-      })
-
-      // ========== 第二阶段：LLM 角色设计 ==========
       const characterLLMId = getNodeId()
-      nodes.push({
-        id: characterLLMId,
-        type: 'llmConfig',
-        position: { x: startPosition.x + colSpacing, y: startPosition.y - rowSpacing },
-        data: {
-          label: '角色设计生成',
-          systemPrompt: `你是专业的绘本角色设计师。根据故事大纲提取所有角色，为每个角色生成适合图像生成的详细提示词。
-
-输出格式（用换行分隔每个角色）：
-[角色名]
-[角色图像生成提示词]
----
-
-输出要求：
-1. 识别故事中的所有角色（主角、配角等）
-2. 提示词包含：外貌特征、服装、表情、姿态、场景
-3. 使用绘本水彩风格描述
-4. 末尾加上"白色简洁背景，儿童绘本水彩风格，温馨治愈，色彩明亮柔和"
-5. 直接输出，不要编号、标题或其他格式标记`,
-          model: 'gpt-4o-mini',
-          outputFormat: 'text'
-        }
-      })
-
-      // 故事大纲 → 角色设计LLM
-      edges.push({
-        id: `edge_${storyInputId}_${characterLLMId}`,
-        source: storyInputId,
-        target: characterLLMId,
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-
-      // 角色参考图配置
       const characterConfigId = getNodeId()
-      nodes.push({
-        id: characterConfigId,
-        type: 'imageConfig',
-        position: { x: startPosition.x + colSpacing * 2, y: startPosition.y - rowSpacing },
-        data: {
-          label: '角色参考图',
-          model: 'doubao-seedream-4-5-251128',
-          size: '2048x2048'
-        }
-      })
-
-      // LLM → 角色图配置
-      edges.push({
-        id: `edge_${characterLLMId}_${characterConfigId}`,
-        source: characterLLMId,
-        target: characterConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-
-      // 角色参考图结果
       const characterImageId = getNodeId()
-      nodes.push({
-        id: characterImageId,
-        type: 'image',
-        position: { x: startPosition.x + colSpacing * 3, y: startPosition.y - rowSpacing },
-        data: {
-          url: '',
-          label: '角色参考图结果'
-        }
-      })
-
-      // 角色配置 → 角色图结果
-      edges.push({
-        id: `edge_${characterConfigId}_${characterImageId}`,
-        source: characterConfigId,
-        target: characterImageId,
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-
-      // ========== 第三阶段：LLM 剧情拆分 ==========
       const storyLLMId = getNodeId()
-      nodes.push({
-        id: storyLLMId,
-        type: 'llmConfig',
-        position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing * 0.5 },
-        data: {
-          label: '剧情拆分',
-          systemPrompt: `你是专业的绘本编剧。将故事拆分成绘本页面内容。
-
-输出格式（严格按此格式，换行分割每页）：
-第1页：[故事配文] | [插画描述提示词]
-第2页：[故事配文] | [插画描述提示词]
-...
-
-要求：
-1. 根据故事复杂度拆分为4-8页
-2. 故事配文简洁温馨，适合3-6岁儿童（每页不超过30字）
-3. 插画描述要详细，包含角色外貌特征、动作、场景、色调
-4. 每页插画描述末尾加上画风说明以保持一致
-5. 故事节奏：开场→发展→高潮→温馨结局`,
-          model: 'gpt-4o',
-          outputFormat: 'text'
-        }
-      })
-
-      // 故事大纲 → 剧情拆分LLM
-      edges.push({
-        id: `edge_${storyInputId}_${storyLLMId}`,
-        source: storyInputId,
-        target: storyLLMId,
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
-
-      // ========== 第四阶段：绘本页面（由 LLM 拆分动态生成） ==========
-      // 操作提示节点
       const hintId = getNodeId()
-      nodes.push({
-        id: hintId,
-        type: 'text',
-        position: { x: startPosition.x + colSpacing * 2.5, y: startPosition.y + rowSpacing * 0.5 },
-        data: {
-          content: `操作步骤：
-1. 先点击「角色设计生成」的【执行生成】，等待生成所有角色参考图
-2. 再点击「剧情拆分」的【执行生成】，等待 LLM 输出剧本
-3. 在剧情拆分节点中点击【拆分为绘本页】按钮
-4. 系统将自动创建每页的故事文字、插画描述和图片生成节点
-5. 每页图片会自动关联角色参考图，保持角色一致性
-6. 点击各页的【立即生成】按钮生成绘本插画`,
-          label: '📖 操作指南'
+
+      nodes.push(
+        {
+          id: storyInputId,
+          type: 'text',
+          position: { x: startPosition.x, y: startPosition.y },
+          data: {
+            content: `Judul buku: Petualangan Mimo si Kelinci
+
+Tema cerita:
+Keberanian, persahabatan, dan rasa ingin tahu
+
+Tokoh utama:
+1. Mimo, kelinci putih kecil dengan telinga merah muda, memakai celana overall biru, ceria dan berani.
+2. Nara, rubah kecil berwarna jingga dengan syal hijau, cerdas dan setia menemani.
+
+Garis besar cerita:
+Mimo menemukan peta misterius di dekat rumah pohon. Ia mengajak Nara mengikuti petunjuk menuju harta karun. Mereka melewati sungai kecil, jembatan kayu, dan hutan berbunga sebelum menyadari bahwa harta terbesar adalah persahabatan mereka.
+
+Gaya ilustrasi:
+Cat air lembut, hangat, penuh warna, cocok untuk anak usia 3 sampai 6 tahun.`,
+            label: 'Garis besar cerita'
+          }
+        },
+        {
+          id: characterLLMId,
+          type: 'llmConfig',
+          position: { x: startPosition.x + colSpacing, y: startPosition.y - rowSpacing },
+          data: {
+            label: 'Rancang prompt karakter',
+            systemPrompt: `Anda adalah desainer karakter buku cerita anak.
+
+Tugas Anda:
+1. Identifikasi semua tokoh dari garis besar cerita.
+2. Tulis prompt gambar terpisah untuk setiap tokoh.
+3. Cantumkan ciri fisik, kostum, ekspresi, pose, dan nuansa visual.
+4. Gunakan bahasa Indonesia.
+5. Tutup setiap prompt dengan arahan gaya: "ilustrasi cat air buku anak, hangat, lembut, ramah anak, latar sederhana".
+
+Format keluaran:
+[Nama tokoh]
+[Prompt gambar]
+---`,
+            model: 'ibm-granite-4-0-h-small',
+            outputFormat: 'text'
+          }
+        },
+        {
+          id: characterConfigId,
+          type: 'imageConfig',
+          position: { x: startPosition.x + colSpacing * 2, y: startPosition.y - rowSpacing },
+          data: {
+            label: 'Buat referensi karakter',
+            model: 'wan-2-6-t2i',
+            size: '2048x2048'
+          }
+        },
+        {
+          id: characterImageId,
+          type: 'image',
+          position: { x: startPosition.x + colSpacing * 3, y: startPosition.y - rowSpacing },
+          data: {
+            url: '',
+            label: 'Hasil referensi karakter'
+          }
+        },
+        {
+          id: storyLLMId,
+          type: 'llmConfig',
+          position: { x: startPosition.x + colSpacing, y: startPosition.y + rowSpacing * 0.5 },
+          data: {
+            label: 'Pisahkan cerita per halaman',
+            systemPrompt: `Anda adalah penulis naskah buku cerita anak.
+
+Pisahkan cerita menjadi 4 sampai 8 halaman.
+
+Format keluaran wajib:
+Halaman 1: [teks cerita singkat] | [prompt ilustrasi]
+Halaman 2: [teks cerita singkat] | [prompt ilustrasi]
+
+Aturan:
+1. Teks tiap halaman singkat, hangat, dan mudah dipahami anak.
+2. Prompt ilustrasi harus menjelaskan adegan, karakter, aksi, suasana, dan warna.
+3. Gunakan bahasa Indonesia.
+4. Tambahkan konsistensi gaya buku cerita cat air pada setiap prompt ilustrasi.`,
+            model: 'ibm-granite-4-0-h-small',
+            outputFormat: 'text'
+          }
+        },
+        {
+          id: hintId,
+          type: 'text',
+          position: { x: startPosition.x + colSpacing * 2.5, y: startPosition.y + rowSpacing * 0.5 },
+          data: {
+            content: `Langkah penggunaan:
+1. Jalankan node "Rancang prompt karakter".
+2. Jalankan node "Buat referensi karakter".
+3. Jalankan node "Pisahkan cerita per halaman".
+4. Gunakan tombol pecah di node LLM untuk membuat node cerita dan ilustrasi per halaman.
+5. Hubungkan hasil referensi karakter ke node ilustrasi agar gaya tokoh tetap konsisten.`,
+            label: 'Panduan penggunaan'
+          }
         }
-      })
+      )
+
+      edges.push(
+        { id: `edge_${storyInputId}_${characterLLMId}`, source: storyInputId, target: characterLLMId, sourceHandle: 'right', targetHandle: 'left' },
+        {
+          id: `edge_${characterLLMId}_${characterConfigId}`,
+          source: characterLLMId,
+          target: characterConfigId,
+          type: 'promptOrder',
+          data: { promptOrder: 1 },
+          sourceHandle: 'right',
+          targetHandle: 'left'
+        },
+        { id: `edge_${characterConfigId}_${characterImageId}`, source: characterConfigId, target: characterImageId, sourceHandle: 'right', targetHandle: 'left' },
+        { id: `edge_${storyInputId}_${storyLLMId}`, source: storyInputId, target: storyLLMId, sourceHandle: 'right', targetHandle: 'left' }
+      )
 
       return { nodes, edges }
     }
   }
 ]
 
-/**
- * Get workflow template by ID | 根据ID获取工作流模板
- */
 export const getWorkflowById = (id) => {
-  return WORKFLOW_TEMPLATES.find(w => w.id === id)
+  return WORKFLOW_TEMPLATES.find((workflow) => workflow.id === id)
 }
 
-/**
- * Get workflows by category | 根据分类获取工作流
- */
 export const getWorkflowsByCategory = (category) => {
-  return WORKFLOW_TEMPLATES.filter(w => w.category === category)
+  return WORKFLOW_TEMPLATES.filter((workflow) => workflow.category === category)
 }
 
 export default WORKFLOW_TEMPLATES
+

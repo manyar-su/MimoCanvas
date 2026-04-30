@@ -235,7 +235,7 @@ const getDefaultNodeData = (type) => {
     case 'text':
       return {
         content: '',
-        label: '文本输入',
+        label: 'Input teks',
         publicProps: {}  // 公共属性（可被 @ 引用）
       }
     case 'imageConfig': {
@@ -245,7 +245,7 @@ const getDefaultNodeData = (type) => {
         model: DEFAULT_IMAGE_MODEL,
         size: imageModel?.defaultParams?.size || '1x1',
         quality: imageModel?.defaultParams?.quality || 'standard',
-        label: '文生图'
+        label: 'Teks ke gambar'
       }
     }
     case 'videoConfig': {
@@ -255,20 +255,20 @@ const getDefaultNodeData = (type) => {
         ratio: videoModel?.defaultParams?.ratio || '16:9',
         duration: videoModel?.defaultParams?.duration || 5,
         model: DEFAULT_VIDEO_MODEL,
-        label: '图生视频'
+        label: 'Gambar ke video'
       }
     }
     case 'video':
       return {
         url: '',
         duration: 0,
-        label: '视频节点'
+        label: 'Node video'
       }
     case 'image':
       return {
         url: '',
-        label: '图片节点',
-        publicProps: { name: '图片' }  // 公共属性（可被 @ 引用）
+        label: 'Node gambar',
+        publicProps: { name: 'Gambar' }  // 公共属性（可被 @ 引用）
       }
     case 'llmConfig':
       return {
@@ -276,7 +276,7 @@ const getDefaultNodeData = (type) => {
         model: DEFAULT_CHAT_MODEL,
         outputFormat: 'text',
         outputContent: '',
-        label: 'LLM文本生成',
+        label: 'Generator teks LLM',
         publicProps: {}  // 公共属性（可被 @ 引用）
       }
     default:
@@ -325,8 +325,9 @@ export const duplicateNode = (id) => {
 
 // Add edge | 添加边
 export const addEdge = (params) => {
+  const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
   const newEdge = {
-    id: `edge_${params.source}_${params.target}`,
+    id: `edge_${params.source}_${params.target}_${uniqueSuffix}`,
     ...params
   }
   edges.value = [...edges.value, newEdge]
@@ -351,8 +352,9 @@ export const addEdges = (edgeSpecs, autoBatch = true) => {
   const ids = []
 
   edgeSpecs.forEach(params => {
+    const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
     const newEdge = {
-      id: `edge_${params.source}_${params.target}`,
+      id: `edge_${params.source}_${params.target}_${uniqueSuffix}`,
       ...params
     }
     edges.value = [...edges.value, newEdge]
@@ -394,8 +396,8 @@ export const initSampleData = () => {
   
   // Add text node | 添加文本节点
   addNode('text', { x: 150, y: 150 }, {
-    content: '一只金毛寻回犬在草地上奔跑，摇着尾巴，脸上带着快乐的表情。它的毛发在阳光下闪耀，眼神充满了对自由的渴望，全身散发着阳光、友善的气息。',
-    label: '文本输入'
+    content: 'Seekor anjing golden retriever berlari di padang rumput dengan ekspresi bahagia, bulunya berkilau terkena matahari, dan suasananya hangat serta bebas.',
+    label: 'Input teks'
   })
   
   // Add image config node | 添加文生图配置节点
@@ -403,7 +405,7 @@ export const initSampleData = () => {
     prompt: '',
     model: 'doubao-seedream-4-5-251128',
     ratio: '16:9 | 4张 | 高清',
-    label: '文生图'
+    label: 'Teks ke gambar'
   })
   
   // Add edge between nodes | 添加节点之间的边

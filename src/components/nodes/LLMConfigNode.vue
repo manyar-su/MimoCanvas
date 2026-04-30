@@ -14,20 +14,20 @@
           </n-icon>
           <span v-if="!isEditingLabel" @dblclick="startEditLabel"
             class="text-sm font-medium text-[var(--text-secondary)] cursor-text hover:bg-[var(--bg-tertiary)] px-1 rounded transition-colors"
-            title="双击编辑名称">{{ nodeLabel }}</span>
+            title="Klik dua kali untuk mengubah nama">{{ nodeLabel }}</span>
           <input v-else ref="labelInputRef" v-model="editingLabelValue" @blur="finishEditLabel"
             @keydown.enter="finishEditLabel" @keydown.escape="cancelEditLabel"
             class="text-sm font-medium bg-[var(--bg-tertiary)] text-[var(--text-secondary)] px-1 rounded outline-none border border-purple-500" />
         </div>
         <div class="flex items-center gap-1">
           <button @click="handleDuplicate" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors"
-            title="复制节点">
+            title="Duplikat node">
             <n-icon :size="14">
               <CopyOutline />
             </n-icon>
           </button>
           <button @click="handleDelete" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors"
-            title="删除节点">
+            title="Hapus node">
             <n-icon :size="14">
               <TrashOutline />
             </n-icon>
@@ -39,7 +39,7 @@
       <div class="p-3 space-y-3">
         <!-- System prompt | 系统提示词 -->
         <div class="relative">
-          <label class="text-xs text-[var(--text-secondary)] mb-1 block">系统提示词</label>
+          <label class="text-xs text-[var(--text-secondary)] mb-1 block">Prompt sistem</label>
           <div class="textarea-wrapper" ref="textareaWrapper">
             <div ref="systemPromptRef" class="editor-content" contenteditable="true" @input="handleInput"
               @keydown="handleKeydown" @paste="handlePaste" @blur="handleBlur" @wheel.stop @mousedown.stop
@@ -60,14 +60,14 @@
 
         <!-- Model selection | 模型选择 -->
         <div>
-          <label class="text-xs text-[var(--text-secondary)] mb-1 block">模型</label>
+          <label class="text-xs text-[var(--text-secondary)] mb-1 block">Model</label>
           <n-select v-model:value="model" :options="modelOptions" label-field="label" value-field="key" size="small"
             @update:value="updateConfig" />
         </div>
 
         <!-- Output format | 输出格式 -->
         <div>
-          <label class="text-xs text-[var(--text-secondary)] mb-1 block">输出格式</label>
+          <label class="text-xs text-[var(--text-secondary)] mb-1 block">Format output</label>
           <n-select v-model:value="outputFormat" :options="formatOptions" size="small" @update:value="updateConfig" />
         </div>
 
@@ -78,19 +78,19 @@
           <n-icon v-else :size="14">
             <SparklesOutline />
           </n-icon>
-          {{ isGenerating ? '生成中...' : '执行生成' }}
+          {{ isGenerating ? 'Sedang memproses...' : 'Jalankan' }}
         </button>
 
         <!-- Output preview | 输出预览 -->
         <div v-if="outputContent" class="mt-2">
           <div class="flex items-center justify-between mb-1">
-            <label class="text-xs text-[var(--text-secondary)]">生成结果</label>
+            <label class="text-xs text-[var(--text-secondary)]">Hasil</label>
             <button @click="handleCopyOutput"
               class="text-xs text-[var(--text-secondary)] hover:text-purple-500 flex items-center gap-1 transition-colors">
               <n-icon :size="12">
                 <CopyOutline />
               </n-icon>
-              复制
+              Salin
             </button>
           </div>
           <div @wheel.stop @mousedown.stop
@@ -106,7 +106,7 @@
               <n-icon v-else :size="12">
                 <ImageOutline />
               </n-icon>
-              {{ isSplitting ? '拆分中...' : '拆分图文' }}
+              {{ isSplitting ? 'Sedang memecah...' : 'Pecah jadi teks + gambar' }}
             </button>
             <button @click="handleSplitToTextOnly" :disabled="isSplitting"
               class="flex-1 px-3 py-1.5 text-xs rounded-lg border border-purple-400 text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 flex items-center justify-center gap-1">
@@ -114,7 +114,7 @@
               <n-icon v-else :size="12">
                 <ListOutline />
               </n-icon>
-              {{ isSplitting ? '拆分中...' : '拆分文本' }}
+              {{ isSplitting ? 'Sedang memecah...' : 'Pecah jadi teks' }}
             </button>
           </div>
           <div v-if="splitMessage" class="mt-1 text-xs text-green-600 dark:text-green-400">{{ splitMessage }}</div>
@@ -405,9 +405,9 @@ const mentionsPreview = computed(() => {
 
 // LLMConfig node menu operations | LLM配置节点菜单操作
 const operations = [
-  { type: 'imageConfig', label: '生图', icon: ImageOutline },
-  { type: 'videoConfig', label: '生视频', icon: VideocamOutline },
-  { type: 'text', label: '文本', icon: DocumentTextOutline }
+  { type: 'imageConfig', label: 'Buat gambar', icon: ImageOutline },
+  { type: 'videoConfig', label: 'Buat video', icon: VideocamOutline },
+  { type: 'text', label: 'Teks', icon: DocumentTextOutline }
 ]
 
 // Handle menu select | 处理菜单选择
@@ -417,9 +417,9 @@ const handleSelect = (item) => {
   const nodeY = currentNode?.position?.y || 0
 
   const defaultData = {
-    imageConfig: { model: 'doubao-seedream-4-5-251128', size: '2048x2048', label: '文生图' },
-    videoConfig: { label: '视频生成' },
-    text: { content: '', label: '文本输入' }
+    imageConfig: { model: 'doubao-seedream-4-5-251128', size: '2048x2048', label: 'Teks ke gambar' },
+    videoConfig: { label: 'Pembuatan video' },
+    text: { content: '', label: 'Input teks' }
   }
 
   const newId = addNode(item.type, { x: nodeX + 400, y: nodeY }, defaultData[item.type] || {})
@@ -764,13 +764,13 @@ const getInputFromConnections = () => {
 // Handle generate | 处理生成
 const handleGenerate = async () => {
   if (!isApiConfigured.value) {
-    window.$message?.warning('请先配置 API Key')
+    window.$message?.warning('Silakan atur API key terlebih dahulu')
     return
   }
 
   const input = getInputFromConnections()
   if (!input && !systemPrompt.value) {
-    window.$message?.warning('请连接输入节点或设置系统提示词')
+    window.$message?.warning('Hubungkan node input atau isi prompt sistem terlebih dahulu')
     return
   }
 
@@ -850,8 +850,8 @@ const handleGenerate = async () => {
       window.$message?.success('生成完成')
     }
   } catch (err) {
-    updateNode(props.id, { error: err.message || '生成失败' })
-    window.$message?.error(err.message || '生成失败')
+    updateNode(props.id, { error: err.message || 'Gagal menghasilkan output' })
+    window.$message?.error(err.message || 'Gagal menghasilkan output')
   } finally {
     isGenerating.value = false
   }
@@ -900,7 +900,7 @@ const handleDelete = () => {
 // Handle duplicate | 处理复制
 const handleDuplicate = () => {
   const newNodeId = duplicateNode(props.id)
-  window.$message?.success('节点已复制')
+  window.$message?.success('Node berhasil diduplikasi')
   if (newNodeId) {
     setTimeout(() => {
       updateNodeInternals(newNodeId)
@@ -913,9 +913,9 @@ const handleCopyOutput = async () => {
   if (!outputContent.value) return
   try {
     await navigator.clipboard.writeText(outputContent.value)
-    window.$message?.success('已复制到剪贴板')
+    window.$message?.success('Berhasil disalin ke clipboard')
   } catch (err) {
-    window.$message?.error('复制失败')
+    window.$message?.error('Gagal menyalin')
   }
 }
 

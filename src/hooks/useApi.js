@@ -155,6 +155,7 @@ export const useImageGeneration = () => {
 
   const images = ref([])
   const currentImage = ref(null)
+  const lastRequestMeta = ref(null)
 
   /**
    * Generate image with fixed params | 固定参数生成图片
@@ -183,11 +184,25 @@ export const useImageGeneration = () => {
 
       // 适配请求参数
       const adaptedParams = adaptRequest('image', requestData)
+      let endpoint = adaptedParams.__endpoint || modelStore.getImageEndpoint(requestData.model)
+      if (endpoint && endpoint.startsWith('/')) {
+        endpoint = `${modelStore.currentBaseUrl}${endpoint}`
+      }
+      if (adaptedParams.__endpoint) {
+        delete adaptedParams.__endpoint
+      }
+
+      lastRequestMeta.value = {
+        provider: modelStore.currentProvider,
+        baseUrl: modelStore.currentBaseUrl,
+        endpoint,
+        model: requestData.model
+      }
 
       // Call API | 调用 API
       const response = await generateImage(adaptedParams, {
         requestType: 'json',
-        endpoint: modelStore.getImageEndpoint()
+        endpoint
       })
 
       // 适配响应数据
@@ -203,7 +218,7 @@ export const useImageGeneration = () => {
     }
   }
 
-  return { loading, error, status, images, currentImage, generate, reset }
+  return { loading, error, status, images, currentImage, lastRequestMeta, generate, reset }
 }
 
 /**

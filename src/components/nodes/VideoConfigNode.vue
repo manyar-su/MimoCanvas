@@ -10,8 +10,8 @@
           v-if="!isEditingLabel"
           @dblclick="startEditLabel"
           class="text-sm font-medium text-[var(--text-secondary)] cursor-text hover:bg-[var(--bg-tertiary)] px-1 rounded transition-colors"
-          title="双击编辑名称"
-        >{{ data.label || '视频生成' }}</span>
+          title="Klik dua kali untuk mengubah nama"
+        >{{ data.label || 'Pembuatan video' }}</span>
         <input
           v-else
           ref="labelInputRef"
@@ -22,12 +22,12 @@
           class="text-sm font-medium bg-[var(--bg-tertiary)] text-[var(--text-secondary)] px-1 rounded outline-none border border-blue-500"
         />
         <div class="flex items-center gap-1">
-          <button @click="handleDuplicate" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="复制节点">
+          <button @click="handleDuplicate" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="Duplikat node">
             <n-icon :size="14">
               <CopyOutline />
             </n-icon>
           </button>
-          <button @click="handleDelete" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="删除节点">
+          <button @click="handleDelete" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="Hapus node">
             <n-icon :size="14">
               <TrashOutline />
             </n-icon>
@@ -39,7 +39,7 @@
       <div class="p-3 space-y-3">
         <!-- Model selector | 模型选择 -->
         <div class="flex items-center justify-between">
-          <span class="text-xs text-[var(--text-secondary)]">模型</span>
+          <span class="text-xs text-[var(--text-secondary)]">Model</span>
           <n-dropdown :options="modelOptions" @select="handleModelSelect">
             <button class="flex items-center gap-1 text-sm text-[var(--text-primary)] hover:text-[var(--accent-color)]">
               {{ displayModelName }}
@@ -50,7 +50,7 @@
 
         <!-- Aspect ratio selector | 宽高比选择 -->
         <div class="flex items-center justify-between">
-          <span class="text-xs text-[var(--text-secondary)]">比例</span>
+          <span class="text-xs text-[var(--text-secondary)]">Rasio</span>
           <n-dropdown :options="ratioOptions" @select="handleRatioSelect">
             <button class="flex items-center gap-1 text-sm text-[var(--text-primary)] hover:text-[var(--accent-color)]">
               {{ localRatio }}
@@ -63,7 +63,7 @@
 
         <!-- Duration selector | 时长选择 -->
         <div class="flex items-center justify-between">
-          <span class="text-xs text-[var(--text-secondary)]">时长</span>
+          <span class="text-xs text-[var(--text-secondary)]">Durasi</span>
           <n-dropdown :options="durationOptions" @select="handleDurationSelect">
             <button class="flex items-center gap-1 text-sm text-[var(--text-primary)] hover:text-[var(--accent-color)]">
               {{ localDuration }}s
@@ -79,7 +79,7 @@
           class="flex items-center gap-2 text-xs text-[var(--text-secondary)] py-1 border-t border-[var(--border-color)]">
           <span class="px-2 py-0.5 rounded-full"
             :class="connectedPrompt ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">
-            提示词 {{ connectedPrompt ? '✓' : '○' }}
+            Prompt {{ connectedPrompt ? '✓' : '○' }}
           </span>
           <span class="px-2 py-0.5 rounded-full"
             :class="imagesByRole.firstFrame ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">
@@ -91,7 +91,7 @@
           </span>
           <span class="px-2 py-0.5 rounded-full"
             :class="imagesByRole.referenceImages.length > 0 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">
-            参考图 {{ imagesByRole.referenceImages.length > 0 ? `✓ ${imagesByRole.referenceImages.length}` : '○' }}
+            Referensi {{ imagesByRole.referenceImages.length > 0 ? `✓ ${imagesByRole.referenceImages.length}` : '○' }}
           </span>
         </div>
 
@@ -112,13 +112,13 @@
             <n-icon :size="16">
               <VideocamOutline />
             </n-icon>
-            生成视频
+            Buat video
           </template>
         </button>
 
         <!-- Error message | 错误信息 -->
         <div v-if="error" class="text-xs text-red-500 mt-2">
-          {{ error.message || '生成失败' }}
+          {{ error.message || 'Gagal membuat video' }}
         </div>
 
         <!-- Generated video preview | 生成视频预览 -->
@@ -263,7 +263,7 @@ const handleModelSelect = (key) => {
 // Handle duplicate | 处理复制
 const handleDuplicate = () => {
   const newNodeId = duplicateNode(props.id)
-  window.$message?.success('节点已复制')
+  window.$message?.success('Node berhasil diduplikasi')
   if (newNodeId) {
     setTimeout(() => {
       updateNodeInternals(newNodeId)
@@ -287,7 +287,7 @@ const handleDurationSelect = (key) => {
 const getConnectedInputs = () => {
   const connectedEdges = edges.value.filter(e => e.target === props.id)
 
-  let prompt = ''
+  const promptParts = []
   let first_frame_image = ''
   let last_frame_image = ''
   const images = [] // input_reference images | 参考图
@@ -297,11 +297,16 @@ const getConnectedInputs = () => {
     if (!sourceNode) continue
 
     if (sourceNode.type === 'text') {
-      prompt = sourceNode.data?.content || ''
+      const content = sourceNode.data?.content || ''
+      if (content) {
+        promptParts.push({ order: edge.data?.promptOrder || 1, content })
+      }
     } else if (sourceNode.type === 'llmConfig') {
       // LLM node output as prompt | LLM 节点输出作为提示词
       const content = sourceNode.data?.outputContent || ''
-      if (content) prompt = content
+      if (content) {
+        promptParts.push({ order: edge.data?.promptOrder || 1, content })
+      }
     } else if (sourceNode.type === 'image' && sourceNode.data?.url) {
       const imageData = sourceNode.data.base64 || sourceNode.data.url
       const role = edge.data?.imageRole || 'first_frame_image'
@@ -316,6 +321,8 @@ const getConnectedInputs = () => {
     }
   }
 
+  promptParts.sort((a, b) => a.order - b.order)
+  const prompt = promptParts.map(p => p.content).join('\n\n')
   return { prompt, first_frame_image, last_frame_image, images }
 }
 
@@ -336,13 +343,13 @@ const handleGenerate = async () => {
 
   const hasInput = prompt || first_frame_image || last_frame_image || images.length > 0
   if (!hasInput) {
-    window.$message?.warning('请先连接文本节点或图片节点')
+    window.$message?.warning('Hubungkan node teks atau node gambar terlebih dahulu')
     isGenerating.value = false
     return
   }
 
   if (!isConfigured.value) {
-    window.$message?.warning('请先配置 API Key')
+    window.$message?.warning('Silakan atur API key terlebih dahulu')
     isGenerating.value = false
     return
   }
@@ -356,7 +363,7 @@ const handleGenerate = async () => {
   const videoNodeId = addNode('video', { x: nodeX + 350, y: nodeY }, {
     url: '',
     loading: true,
-    label: '视频生成中...'
+        label: 'Video sedang diproses...'
   })
   createdVideoNodeId.value = videoNodeId
 
@@ -418,11 +425,11 @@ const handleGenerate = async () => {
       updateNode(videoNodeId, {
         url: url,
         loading: false,
-        label: '视频生成',
+        label: 'Hasil video',
         model: localModel.value,
         updatedAt: Date.now()
       })
-      window.$message?.success('视频生成成功')
+      window.$message?.success('Video berhasil dibuat')
       // Mark this config node as executed | 标记配置节点已执行
       updateNode(props.id, { executed: true, outputNodeId: videoNodeId })
     } else if (newTaskId) {
@@ -430,7 +437,7 @@ const handleGenerate = async () => {
       updateNode(videoNodeId, {
         taskId: newTaskId,
         loading: true,
-        label: '视频生成中...',
+        label: 'Video sedang diproses...',
         model: localModel.value,
         updatedAt: Date.now()
       })
@@ -442,11 +449,11 @@ const handleGenerate = async () => {
     // Update node to show error | 更新节点显示错误
     updateNode(videoNodeId, {
       loading: false,
-      error: err.message || '生成失败',
-      label: '生成失败',
+      error: err.message || 'Gagal membuat video',
+      label: 'Gagal membuat video',
       updatedAt: Date.now()
     })
-    window.$message?.error(err.message || '视频生成失败')
+    window.$message?.error(err.message || 'Gagal membuat video')
   } finally {
     isGenerating.value = false
   }
@@ -454,7 +461,7 @@ const handleGenerate = async () => {
 
 // Start editing label | 开始编辑 label
 const startEditLabel = () => {
-  editingLabelValue.value = props.data?.label || '视频生成'
+  editingLabelValue.value = props.data?.label || 'Pembuatan video'
   isEditingLabel.value = true
   nextTick(() => {
     labelInputRef.value?.focus()

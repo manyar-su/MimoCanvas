@@ -15,6 +15,12 @@ import {
 } from '@/config/models'
 import { PROVIDERS, getProviderList, getDefaultProvider, getProviderConfig, getDefaultBaseUrl } from '@/config/providers'
 
+const normalizeBaseUrl = (url = '') => {
+  const trimmed = String(url || '').trim().replace(/\/+$/, '')
+  if (!trimmed) return ''
+  return trimmed.replace(/\/v1$/i, '')
+}
+
 // 存储键名
 const STORAGE_KEYS = {
   PROVIDER: 'api-provider',
@@ -29,6 +35,11 @@ const STORAGE_KEYS = {
   CUSTOM_VIDEO_MODELS_BY_PROVIDER: 'custom-video-models-by-provider',
   API_KEYS_BY_PROVIDER: 'api-keys-by-provider',
   BASE_URLS_BY_PROVIDER: 'base-urls-by-provider'
+}
+
+const DEFAULT_API_KEYS = {
+  runpodImage: '',
+  runpodChat: ''
 }
 
 /**
@@ -159,8 +170,10 @@ export const useModelStore = defineStore('model', () => {
   const baseUrlsByProvider = ref(getStoredJson(STORAGE_KEYS.BASE_URLS_BY_PROVIDER, {}))
 
   // 当前渠道的 API Key 和 Base URL
-  const currentApiKey = computed(() => apiKeysByProvider.value[currentProvider.value] || '')
-  const currentBaseUrl = computed(() => baseUrlsByProvider.value[currentProvider.value] || getDefaultBaseUrl(currentProvider.value))
+  const currentApiKey = computed(
+    () => apiKeysByProvider.value[currentProvider.value] || DEFAULT_API_KEYS[currentProvider.value] || ''
+  )
+  const currentBaseUrl = computed(() => normalizeBaseUrl(baseUrlsByProvider.value[currentProvider.value] || getDefaultBaseUrl(currentProvider.value)))
 
   // 设置指定渠道的 API Key
   const setApiKeyByProvider = (provider, apiKey) => {
@@ -169,13 +182,24 @@ export const useModelStore = defineStore('model', () => {
 
   // 设置指定渠道的 Base URL
   const setBaseUrlByProvider = (provider, baseUrl) => {
-    baseUrlsByProvider.value[provider] = baseUrl
+    baseUrlsByProvider.value[provider] = normalizeBaseUrl(baseUrl)
   }
 
   // 清除指定渠道的 API 配置
   const clearApiConfigByProvider = (provider) => {
     delete apiKeysByProvider.value[provider]
     delete baseUrlsByProvider.value[provider]
+  }
+
+  const clearAllApiConfigs = () => {
+    apiKeysByProvider.value = {}
+    baseUrlsByProvider.value = {}
+    try {
+      localStorage.removeItem('apiKey')
+      localStorage.removeItem('baseUrl')
+    } catch {
+      // ignore
+    }
   }
 
   // ============ Computed: All Models (built-in + custom + by provider) ============
@@ -608,6 +632,7 @@ export const useModelStore = defineStore('model', () => {
     baseUrlsByProvider,
     setApiKeyByProvider,
     setBaseUrlByProvider,
-    clearApiConfigByProvider
+    clearApiConfigByProvider,
+    clearAllApiConfigs
   }
 })

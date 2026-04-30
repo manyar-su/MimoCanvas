@@ -11,7 +11,7 @@
           v-if="!isEditingLabel"
           @dblclick="startEditLabel"
           class="text-sm font-medium text-[var(--text-secondary)] cursor-text hover:bg-[var(--bg-tertiary)] px-1 rounded transition-colors"
-          title="双击编辑名称"
+          title="Klik dua kali untuk mengubah nama"
         >{{ data.label }}</span>
         <input
           v-else
@@ -23,12 +23,12 @@
           class="text-sm font-medium bg-[var(--bg-tertiary)] text-[var(--text-secondary)] px-1 rounded outline-none border border-blue-500"
         />
         <div class="flex items-center gap-1">
-          <button @click="handleDuplicate" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="复制节点">
+          <button @click="handleDuplicate" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="Duplikat node">
             <n-icon :size="14">
               <CopyOutline />
             </n-icon>
           </button>
-          <button @click="handleDelete" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="删除节点">
+          <button @click="handleDelete" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="Hapus node">
             <n-icon :size="14">
               <TrashOutline />
             </n-icon>
@@ -65,8 +65,8 @@
           class="mt-2 px-3 py-1.5 text-xs rounded-lg bg-[var(--bg-tertiary)] hover:bg-[var(--accent-color)] hover:text-white border border-[var(--border-color)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
         >
           <n-spin v-if="isPolishing" :size="12" />
-          <span v-else>✨</span>
-          AI 润色
+          <span v-else>AI</span>
+          Perhalus prompt
         </button>
       </div>
 
@@ -116,14 +116,14 @@ const isApiConfigured = computed(() => !!modelStore.currentApiKey)
 
 // Chat hook for polish | 润色用的 Chat hook
 const { send: sendChat } = useChat({
-  systemPrompt: '你是一个专业的AI绘画提示词专家。将用户输入的内容美化成高质量的生图提示词，包含风格、光线、構图、细节等要素。直接返回提示词，不要其他解释。',
+  systemPrompt: 'Anda adalah spesialis prompt gambar AI. Ubah masukan pengguna menjadi prompt visual yang lebih kaya, jelas, dan siap pakai. Sertakan gaya, pencahayaan, komposisi, suasana, dan detail penting. Kembalikan hanya prompt akhir tanpa penjelasan tambahan.',
   model: 'gpt-4o-mini'
 })
 
 // Local content state | 本地内容状态
 const showHandleMenu = ref(false)
 const content = ref(props.data?.content || '')
-const placeholder = '请输入文本内容，输入 @ 可引用图片节点...'
+const placeholder = 'Masukkan isi teks di sini. Ketik @ untuk menyisipkan referensi dari node gambar...'
 
 // Label editing state | Label 编辑状态
 const isEditingLabel = ref(false)
@@ -428,8 +428,8 @@ const editorHtml = computed(() => {
 
 // Text node menu operations | 文本节点菜单操作
 const operations = [
-  { type: 'imageConfig', label: '生图', icon: ImageOutline },
-  { type: 'videoConfig', label: '生视频', icon: VideocamOutline },
+  { type: 'imageConfig', label: 'Buat gambar', icon: ImageOutline },
+  { type: 'videoConfig', label: 'Buat video', icon: VideocamOutline },
   { type: 'llmConfig', label: 'LLM', icon: ChatbubbleOutline }
 ]
 
@@ -440,9 +440,9 @@ const handleSelect = (item) => {
   const nodeY = currentNode?.position?.y || 0
 
   const defaultData = {
-    imageConfig: { model: 'doubao-seedream-4-5-251128', size: '2048x2048', label: '文生图' },
-    videoConfig: { label: '视频生成' },
-    llmConfig: { label: 'LLM文本生成' }
+    imageConfig: { model: 'doubao-seedream-4-5-251128', size: '2048x2048', label: 'Teks ke gambar' },
+    videoConfig: { label: 'Pembuatan video' },
+    llmConfig: { label: 'Generator teks LLM' }
   }
 
   const newId = addNode(item.type, { x: nodeX + 400, y: nodeY }, defaultData[item.type] || {})
@@ -455,7 +455,7 @@ const handleSelect = (item) => {
   })
 
   setTimeout(() => updateNodeInternals(newId), 50)
-  window.$message?.success(`已创建${item.label}节点`)
+  window.$message?.success(`Node ${item.label} berhasil dibuat`)
 }
 
 // Handle input for @ trigger | 处理 @ 触发输入（参考 MaterialInput）
@@ -623,7 +623,11 @@ const handlePolish = async () => {
   
   // Check API configuration | 检查 API 配置
   if (!isApiConfigured.value) {
-    window.$message?.warning('请先配置 API Key')
+    window.$message?.warning('Silakan atur API key terlebih dahulu')
+    return
+  }
+  if (modelStore.currentProvider === 'runpodImage') {
+    window.$message?.warning('AI Perhalus Prompt membutuhkan provider chat. Pilih Runpod Chat, Chatfire, atau OpenAI terlebih dahulu.')
     return
   }
 
@@ -637,11 +641,11 @@ const handlePolish = async () => {
     if (result) {
       content.value = result
       updateNode(props.id, { content: result })
-      window.$message?.success('提示词已润色')
+      window.$message?.success('Prompt berhasil diperhalus')
     }
   } catch (err) {
     content.value = originalContent
-    window.$message?.error(err.message || '润色失败')
+    window.$message?.error(err.message || 'Gagal memperhalus prompt')
   } finally {
     isPolishing.value = false
   }
@@ -679,7 +683,7 @@ const handleDelete = () => {
 // Handle duplicate | 处理复制
 const handleDuplicate = () => {
   const newNodeId = duplicateNode(props.id)
-  window.$message?.success('节点已复制')
+  window.$message?.success('Node berhasil diduplikasi')
   if (newNodeId) {
     setTimeout(() => {
       updateNodeInternals(newNodeId)
@@ -697,7 +701,7 @@ const handleImageGen = () => {
   const configNodeId = addNode('imageConfig', { x: nodeX + 400, y: nodeY }, {
     model: 'doubao-seedream-4-5-251128',
     size: '2048x2048',
-    label: '文生图'
+    label: 'Teks ke gambar'
   })
 
   // Auto connect | 自动连接
@@ -722,7 +726,7 @@ const handleVideoGen = () => {
 
   // Create videoConfig node | 创建视频配置节点
   const configNodeId = addNode('videoConfig', { x: nodeX + 400, y: nodeY }, {
-    label: '视频生成'
+    label: 'Pembuatan video'
   })
 
   // Auto connect | 自动连接

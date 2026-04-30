@@ -11,7 +11,7 @@
           v-if="!isEditingLabel"
           @dblclick="startEditLabel"
           class="text-sm font-medium text-[var(--text-secondary)] cursor-text hover:bg-[var(--bg-tertiary)] px-1 rounded transition-colors"
-          title="双击编辑名称"
+          title="Klik dua kali untuk mengubah nama"
         >{{ data.label }}</span>
         <input
           v-else
@@ -23,12 +23,12 @@
           class="text-sm font-medium bg-[var(--bg-tertiary)] text-[var(--text-secondary)] px-1 rounded outline-none border border-blue-500"
         />
         <div class="flex items-center gap-1">
-          <button @click="handleDuplicate" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="复制节点">
+          <button @click="handleDuplicate" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="Duplikat node">
             <n-icon :size="14">
               <CopyOutline />
             </n-icon>
           </button>
-          <button @click="handleDelete" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="删除节点">
+          <button @click="handleDelete" class="p-1 hover:bg-[var(--bg-tertiary)] rounded transition-colors" title="Hapus node">
             <n-icon :size="14">
               <TrashOutline />
             </n-icon>
@@ -40,7 +40,7 @@
       <div class="p-3 space-y-3">
         <!-- Model selector | 模型选择 -->
         <div class="flex items-center justify-between">
-          <span class="text-xs text-[var(--text-secondary)]">模型</span>
+          <span class="text-xs text-[var(--text-secondary)]">Model</span>
           <n-dropdown :options="modelOptions" @select="handleModelSelect">
             <button class="flex items-center gap-1 text-sm text-[var(--text-primary)] hover:text-[var(--accent-color)]">
               {{ displayModelName }}
@@ -51,7 +51,7 @@
 
         <!-- Quality selector | 画质选择 -->
         <div v-if="hasQualityOptions" class="flex items-center justify-between">
-          <span class="text-xs text-[var(--text-secondary)]">画质</span>
+          <span class="text-xs text-[var(--text-secondary)]">Kualitas</span>
           <n-dropdown :options="qualityOptions" @select="handleQualitySelect">
             <button class="flex items-center gap-1 text-sm text-[var(--text-primary)] hover:text-[var(--accent-color)]">
               {{ displayQuality }}
@@ -62,7 +62,7 @@
 
         <!-- Size selector | 尺寸选择 -->
         <div v-if="hasSizeOptions" class="flex items-center justify-between">
-          <span class="text-xs text-[var(--text-secondary)]">尺寸</span>
+          <span class="text-xs text-[var(--text-secondary)]">Ukuran</span>
           <div class="flex items-center gap-2">
             <n-dropdown :options="sizeOptions" @select="handleSizeSelect">
               <button
@@ -80,17 +80,30 @@
         <div v-if="currentModelConfig?.tips" class="text-xs text-[var(--text-tertiary)] bg-[var(--bg-tertiary)] rounded px-2 py-1">
           💡 {{ currentModelConfig.tips }}
         </div>
+        <div v-if="isCurrentModelI2I" class="space-y-2">
+          <div class="text-xs text-[var(--text-secondary)]">Foto referensi (wajib untuk model image-to-image)</div>
+          <input ref="referenceInputRef" type="file" accept="image/*" class="hidden" @change="handleReferenceUpload" />
+          <button @click="triggerReferenceUpload" class="w-full py-2 px-3 rounded-lg border border-[var(--border-color)] text-sm text-[var(--text-primary)] hover:border-[var(--accent-color)] transition-colors">
+            Upload foto referensi
+          </button>
+          <div v-if="uploadedReferenceImage" class="rounded-lg overflow-hidden bg-[var(--bg-tertiary)] border border-[var(--border-color)]">
+            <img :src="uploadedReferenceImage" class="w-full max-h-40 object-contain" />
+          </div>
+          <div v-else class="text-xs text-amber-500">
+            Belum ada foto referensi. Upload dulu agar bisa diproses.
+          </div>
+        </div>
 
         <!-- Connected inputs indicator | 连接输入指示 -->
         <div
           class="flex items-center gap-2 text-xs text-[var(--text-secondary)] py-1 border-t border-[var(--border-color)]">
           <span class="px-2 py-0.5 rounded-full"
             :class="connectedPrompts.length > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">
-            提示词 {{ connectedPrompts.length > 0 ? `${connectedPrompts.length}个` : '○' }}
+            Prompt {{ connectedPrompts.length > 0 ? `${connectedPrompts.length}` : '○' }}
           </span>
           <span class="px-2 py-0.5 rounded-full"
             :class="connectedRefImages.length > 0 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">
-            参考图 {{ connectedRefImages.length > 0 ? `${connectedRefImages.length}张` : '○' }}
+            Gambar referensi {{ connectedRefImages.length > 0 ? `${connectedRefImages.length}` : '○' }}
           </span>
         </div>
 
@@ -102,7 +115,7 @@
             <n-spin v-if="loading" :size="14" />
             <template v-else>
               <n-icon :size="14"><AddOutline /></n-icon>
-              新建生成
+              Buat baru
             </template>
           </button>
           <!-- Replace existing (secondary) | 替换现有（次按钮） -->
@@ -111,7 +124,7 @@
             <n-spin v-if="loading" :size="14" />
             <template v-else>
               <n-icon :size="14"><RefreshOutline /></n-icon>
-              替换
+              Ganti
             </template>
           </button>
         </div>
@@ -121,13 +134,19 @@
           <template v-else>
             <span
               class="text-[var(--accent-color)] bg-white rounded-full w-4 h-4 flex items-center justify-center text-xs">◆</span>
-            立即生成
+            Buat sekarang
           </template>
         </button>
 
         <!-- Error message | 错误信息 -->
         <div v-if="error" class="text-xs text-red-500 mt-2">
-          {{ error.message || '生成失败' }}
+          {{ error.message || 'Gagal membuat' }}
+        </div>
+        <div v-if="error && lastRequestMeta" class="text-[11px] text-[var(--text-secondary)] mt-1 break-all">
+          <div>Provider: {{ lastRequestMeta.provider }}</div>
+          <div>Model: {{ lastRequestMeta.model }}</div>
+          <div>Base URL: {{ lastRequestMeta.baseUrl }}</div>
+          <div>Endpoint: {{ lastRequestMeta.endpoint }}</div>
         </div>
 
         <!-- Generated images preview | 生成图片预览 -->
@@ -184,13 +203,15 @@ const { updateNodeInternals } = useVueFlow()
 const isConfigured = computed(() => !!modelStore.currentApiKey)
 
 // Image generation hook | 图片生成 hook
-const { loading, error, images: generatedImages, generate } = useImageGeneration()
+const { loading, error, images: generatedImages, lastRequestMeta, generate } = useImageGeneration()
 
 // Local state | 本地状态
 const showHandleMenu = ref(false)
 const localModel = ref(props.data?.model || DEFAULT_IMAGE_MODEL)
 const localSize = ref(props.data?.size || '2048x2048')
 const localQuality = ref(props.data?.quality || 'standard')
+const uploadedReferenceImage = ref(props.data?.uploadedReferenceImage || '')
+const referenceInputRef = ref(null)
 
 // Label editing state | Label 编辑状态
 const isEditingLabel = ref(false)
@@ -214,7 +235,7 @@ const handleSelect = (item) => {
 
     // Create new image node for editing
     const imageNodeId = addNode('image', { x: nodeX + 400, y: nodeY }, {
-      label: '图片编辑'
+      label: 'Edit gambar'
     })
 
     // Connect current config to new image node
@@ -226,7 +247,7 @@ const handleSelect = (item) => {
     })
 
     setTimeout(() => updateNodeInternals(imageNodeId), 50)
-    window.$message?.success('已创建图片编辑节点')
+    window.$message?.success('Node edit gambar berhasil dibuat')
   }
 }
 
@@ -234,7 +255,15 @@ const handleSelect = (item) => {
 const currentModelConfig = computed(() => getModelConfig(localModel.value))
 
 // Model options from Pinia store (filtered by provider) | 从 Pinia store 获取模型选项（根据渠道过滤）
-const modelOptions = computed(() => modelStore.allImageModelOptions)
+const modelOptions = computed(() => {
+  const hasAnyReference = connectedRefImages.value.length > 0 || !!uploadedReferenceImage.value
+  return modelStore.allImageModels
+    .filter((m) => {
+      const mode = m.imageMode || 't2i'
+      return hasAnyReference ? true : mode === 't2i'
+    })
+    .map((m) => ({ label: m.label, key: m.key }))
+})
 
 // Display model name | 显示模型名称
 const displayModelName = computed(() => {
@@ -242,9 +271,9 @@ const displayModelName = computed(() => {
   // 如果当前模型不在选项中，尝试从 allImageModels 找到
   if (!model) {
     const allModel = modelStore.allImageModels.find(m => m.key === localModel.value)
-    return allModel?.label || localModel.value || '选择模型'
+    return allModel?.label || localModel.value || 'Pilih model'
   }
-  return model?.label || localModel.value || '选择模型'
+  return model?.label || localModel.value || 'Pilih model'
 })
 
 // Quality options based on model | 基于模型的画质选项
@@ -260,7 +289,7 @@ const hasQualityOptions = computed(() => {
 // Display quality | 显示画质
 const displayQuality = computed(() => {
   const option = qualityOptions.value.find(o => o.key === localQuality.value)
-  return option?.label || '标准画质'
+  return option?.label || 'Kualitas standar'
 })
 
 // Size options based on model and quality | 基于模型和画质的尺寸选项
@@ -348,6 +377,11 @@ const connectedPrompts = computed(() => {
 // Computed connected reference images | 计算连接的参考图
 const connectedRefImages = computed(() => {
   return getConnectedInputs().refImages
+})
+const isNanoBanana2 = computed(() => localModel.value === 'google-nano-banana-2-edit')
+const isCurrentModelI2I = computed(() => {
+  const config = getModelConfig(localModel.value)
+  return (config?.imageMode || 't2i') === 'i2i'
 })
 
 // 已连接的文本节点 ID 列表（用于 @ 提及时过滤）
@@ -521,6 +555,21 @@ const handleSizeSelect = (size) => {
   localSize.value = size
   updateNode(props.id, { size })
 }
+const triggerReferenceUpload = () => {
+  referenceInputRef.value?.click()
+}
+const handleReferenceUpload = (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    const base64 = reader.result
+    uploadedReferenceImage.value = base64
+    updateNode(props.id, { uploadedReferenceImage: base64 })
+    window.$message?.success('Foto referensi berhasil diupload')
+  }
+  reader.readAsDataURL(file)
+}
 
 // Update size from manual input | 更新手动输入的尺寸
 const updateSize = () => {
@@ -569,9 +618,17 @@ const hasConnectedImageWithContent = computed(() => {
 // mode: 'auto' = 自动判断, 'replace' = 替换现有, 'new' = 新建节点
 const handleGenerate = async (mode = 'auto') => {
   const { prompt, prompts, refImages, refImagesWithOrder } = getConnectedInputs()
+  const effectiveRefImages = [...refImages]
+  if (uploadedReferenceImage.value) {
+    effectiveRefImages.unshift(uploadedReferenceImage.value)
+  }
 
-  if (!prompt && refImages.length === 0) {
-    window.$message?.warning('请连接文本节点（提示词）或图片节点（参考图）')
+  if (!prompt && effectiveRefImages.length === 0) {
+    window.$message?.warning('Hubungkan node teks sebagai prompt atau node gambar sebagai referensi terlebih dahulu')
+    return
+  }
+  if (isCurrentModelI2I.value && effectiveRefImages.length === 0) {
+    window.$message?.warning('Model ini wajib memakai foto referensi')
     return
   }
   
@@ -586,7 +643,7 @@ const handleGenerate = async (mode = 'auto') => {
   }
 
   if (!isConfigured.value) {
-    window.$message?.warning('请先配置 API Key')
+    window.$message?.warning('Silakan atur API key terlebih dahulu')
     return
   }
 
@@ -626,7 +683,7 @@ const handleGenerate = async (mode = 'auto') => {
     imageNodeId = addNode('image', { x: nodeX + 400, y: nodeY + yOffset }, {
       url: '',
       loading: true,
-      label: '图像生成结果'
+      label: 'Hasil pembuatan gambar'
     })
 
     // Auto-connect imageConfig → image | 自动连接 生图配置 → 图片
@@ -656,8 +713,8 @@ const handleGenerate = async (mode = 'auto') => {
     }
 
     // Add reference image if provided | 如果有参考图则添加
-    if (refImages.length > 0) {
-      params.image = refImages
+    if (effectiveRefImages.length > 0) {
+      params.image = effectiveRefImages
     }
 
     const result = await generate(params)
@@ -667,7 +724,7 @@ const handleGenerate = async (mode = 'auto') => {
       updateNode(imageNodeId, {
         url: result[0].url,
         loading: false,
-        label: '文生图',
+        label: 'Gambar hasil prompt',
         model: localModel.value,
         updatedAt: Date.now()
       })
@@ -675,22 +732,22 @@ const handleGenerate = async (mode = 'auto') => {
       // Mark this config node as executed | 标记配置节点已执行
       updateNode(props.id, { executed: true, outputNodeId: imageNodeId })
     }
-    window.$message?.success('图片生成成功')
+    window.$message?.success('Gambar berhasil dibuat')
   } catch (err) {
     // Update node to show error | 更新节点显示错误
     updateNode(imageNodeId, {
       loading: false,
-      error: err.message || '生成失败',
+      error: err.message || 'Gagal membuat gambar',
       updatedAt: Date.now()
     })
-    window.$message?.error(err.message || '图片生成失败')
+    window.$message?.error(err.message || 'Gagal membuat gambar')
   }
 }
 
 // Handle duplicate | 处理复制
 const handleDuplicate = () => {
   const newNodeId = duplicateNode(props.id)
-  window.$message?.success('节点已复制')
+  window.$message?.success('Node berhasil diduplikasi')
   if (newNodeId) {
     setTimeout(() => {
       updateNodeInternals(newNodeId)
@@ -725,7 +782,7 @@ const cancelEditLabel = () => {
 // Handle delete | 处理删除
 const handleDelete = () => {
   removeNode(props.id)
-  window.$message?.success('节点已删除')
+  window.$message?.success('Node berhasil dihapus')
 }
 
 // 监听模型变化，同步 Quality 和 Size

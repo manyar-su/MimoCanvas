@@ -8,7 +8,7 @@
           @click="showApiSettings = true"
           class="p-2 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
           :class="{ 'text-[var(--accent-color)]': isApiConfigured }"
-          title="API 设置"
+          title="Pengaturan API"
         >
           <n-icon :size="20"><SettingsOutline /></n-icon>
         </button>
@@ -21,7 +21,7 @@
       <section class="text-center mb-12">
         <div class="flex items-center justify-center gap-4 mb-8">
           <img src="../assets/logo.png" alt="Logo" class="w-12 h-12 md:w-16 md:h-16" />
-          <h1 class="text-2xl md:text-4xl font-bold text-[var(--text-primary)]">欢迎来到火宝无限画布</h1>
+          <h1 class="text-2xl md:text-4xl font-bold text-[var(--text-primary)]">Selamat datang di Mimo Kanvas Tanpa Batas</h1>
         </div>
         
         <!-- Input area | 输入区域 -->
@@ -29,7 +29,7 @@
           <div class="bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-color)] p-4 shadow-sm">
             <textarea
               v-model="inputText"
-              placeholder="输入你的创意，开始新项目"
+              placeholder="Masukkan ide Anda untuk memulai proyek baru"
               class="w-full bg-transparent resize-none outline-none text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] min-h-[80px]"
               @keydown.enter.ctrl="handleCreateWithInput"
             />
@@ -55,7 +55,7 @@
           
           <!-- Quick suggestions | 快捷建议 -->
           <div class="flex flex-wrap items-center justify-center gap-2 mt-4">
-            <span class="text-sm text-[var(--text-secondary)]">推荐：</span>
+            <span class="text-sm text-[var(--text-secondary)]">Rekomendasi:</span>
             <button 
               v-for="tag in suggestions" 
               :key="tag"
@@ -74,25 +74,25 @@
       <!-- My projects section | 我的项目区域 -->
       <section ref="projectsSection">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-[var(--text-primary)]">我的项目</h2>
+          <h2 class="text-lg font-semibold text-[var(--text-primary)]">Proyek Saya</h2>
           <button 
             @click="createNewProject"
             class="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white transition-colors"
           >
             <n-icon :size="16"><AddOutline /></n-icon>
-            新建项目
+            Proyek Baru
           </button>
         </div>
         
         <!-- Empty state | 空状态 -->
         <div v-if="projects.length === 0" class="text-center py-12 bg-[var(--bg-secondary)] rounded-xl border border-dashed border-[var(--border-color)]">
           <n-icon :size="48" class="text-[var(--text-secondary)] mb-4"><FolderOutline /></n-icon>
-          <p class="text-[var(--text-secondary)] mb-4">还没有项目，创建一个开始吧</p>
+          <p class="text-[var(--text-secondary)] mb-4">Belum ada proyek, buat satu untuk memulai</p>
           <button 
             @click="createNewProject"
             class="px-4 py-2 text-sm rounded-lg bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white transition-colors"
           >
-            创建第一个项目
+            Buat Proyek Pertama
           </button>
         </div>
         
@@ -139,7 +139,7 @@
                 
                 <!-- Hover overlay | 悬浮遮罩 -->
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span class="text-white text-sm">打开项目</span>
+                  <span class="text-white text-sm">Buka proyek</span>
                 </div>
               </div>
               <p class="text-sm text-[var(--text-primary)] truncate">{{ project.name }}</p>
@@ -167,14 +167,14 @@
       <button 
         @click="createNewProject"
         class="p-2 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
-        title="新建项目"
+        title="Proyek baru"
       >
         <n-icon :size="20"><DocumentOutline /></n-icon>
       </button>
       <button 
         @click="scrollToProjects"
         class="p-2 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
-        title="我的项目"
+        title="Proyek saya"
       >
         <n-icon :size="20"><FolderOutline /></n-icon>
       </button>
@@ -184,11 +184,11 @@
     <ApiSettings v-model:show="showApiSettings" @saved="refreshApiConfig" />
 
     <!-- Rename modal | 重命名弹窗 -->
-    <n-modal v-model:show="showRenameModal" preset="dialog" title="重命名项目">
-      <n-input v-model:value="renameValue" placeholder="请输入项目名称" />
+    <n-modal v-model:show="showRenameModal" preset="dialog" title="Ganti nama proyek">
+      <n-input v-model:value="renameValue" placeholder="Masukkan nama proyek" />
       <template #action>
-        <n-button @click="showRenameModal = false">取消</n-button>
-        <n-button type="primary" @click="confirmRename">确定</n-button>
+        <n-button @click="showRenameModal = false">Batal</n-button>
+        <n-button type="primary" @click="confirmRename">Simpan</n-button>
       </template>
     </n-modal>
   </div>
@@ -279,10 +279,10 @@ const renameTargetId = ref(null)
 
 // Suggestions tags | 建议标签
 const suggestions = [
-  '雨中魔法森林',
-  '日式街面美食摄影',
-  '瀑布水流飞溅',
-  '雨天富声旁边花语'
+  'Hutan ajaib saat hujan',
+  'Fotografi kuliner jalanan Jepang',
+  'Percikan air terjun',
+  'Bunga-bunga di tepi jalan saat hujan'
 ]
 
 // Format date | 格式化日期
@@ -293,23 +293,23 @@ const formatDate = (date) => {
   const diff = now - d
   
   // Less than 1 minute | 小于1分钟
-  if (diff < 60000) return '刚刚'
+  if (diff < 60000) return 'Baru saja'
   // Less than 1 hour | 小于1小时
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`
+  if (diff < 3600000) return `${Math.floor(diff / 60000)} menit lalu`
   // Less than 1 day | 小于1天
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)} jam lalu`
   // Less than 7 days | 小于7天
-  if (diff < 604800000) return `${Math.floor(diff / 86400000)}天前`
+  if (diff < 604800000) return `${Math.floor(diff / 86400000)} hari lalu`
   // Format as date | 格式化为日期
   return `${d.getMonth() + 1}/${d.getDate()}`
 }
 
 // Get project actions | 获取项目操作选项
 const getProjectActions = (project) => [
-  { label: '重命名', key: 'rename', icon: () => h(NIcon, null, { default: () => h(CreateOutline) }) },
-  { label: '复制', key: 'duplicate', icon: () => h(NIcon, null, { default: () => h(CopyOutline) }) },
+  { label: 'Ganti nama', key: 'rename', icon: () => h(NIcon, null, { default: () => h(CreateOutline) }) },
+  { label: 'Duplikat', key: 'duplicate', icon: () => h(NIcon, null, { default: () => h(CopyOutline) }) },
   { type: 'divider' },
-  { label: '删除', key: 'delete', icon: () => h(NIcon, null, { default: () => h(TrashOutline) }) }
+  { label: 'Hapus', key: 'delete', icon: () => h(NIcon, null, { default: () => h(TrashOutline) }) }
 ]
 
 // Handle project action | 处理项目操作
@@ -323,18 +323,18 @@ const handleProjectAction = (key, project) => {
     case 'duplicate':
       const newId = duplicateProject(project.id)
       if (newId) {
-        window.$message?.success('项目已复制')
+        window.$messageGambar .success('Proyek berhasil diduplikasi')
       }
       break
     case 'delete':
       dialog.warning({
-        title: '删除项目',
-        content: `确定要删除项目「${project.name}」吗？此操作不可恢复。`,
-        positiveText: '删除',
-        negativeText: '取消',
+        title: 'Hapus proyek',
+        content: `Yakin ingin menghapus proyek "${project.name}"Gambar  Tindakan ini tidak dapat dibatalkan.`,
+        positiveText: 'Hapus',
+        negativeText: 'Batal',
         onPositiveClick: () => {
           deleteProject(project.id)
-          window.$message?.success('项目已删除')
+          window.$messageGambar .success('Proyek berhasil dihapus')
         }
       })
       break
@@ -345,7 +345,7 @@ const handleProjectAction = (key, project) => {
 const confirmRename = () => {
   if (renameTargetId.value && renameValue.value.trim()) {
     renameProject(renameTargetId.value, renameValue.value.trim())
-    window.$message?.success('已重命名')
+    window.$messageGambar .success('Nama proyek diperbarui')
   }
   showRenameModal.value = false
   renameTargetId.value = null
@@ -357,9 +357,9 @@ const checkApiKeyAndNavigate = (callback) => {
   
   if (!isApiConfigured.value) {
     dialog.warning({
-      title: '未配置 API Key',
-      content: '请先在设置中配置 API Key 才能使用画布功能。',
-      positiveText: '知道了'
+      title: 'API Key belum dikonfigurasi',
+      content: 'Silakan atur API Key terlebih dahulu di menu pengaturan untuk menggunakan fitur kanvas.',
+      positiveText: 'Mengerti'
     })
     return false
   }
@@ -370,7 +370,7 @@ const checkApiKeyAndNavigate = (callback) => {
 // Create new project | 创建新项目
 const createNewProject = () => {
   checkApiKeyAndNavigate(() => {
-    const id = createProject('未命名项目')
+    const id = createProject('Proyek tanpa nama')
     router.push(`/canvas/${id}`)
   })
 }
@@ -378,7 +378,7 @@ const createNewProject = () => {
 // Create project with input text | 使用输入文本创建项目
 const handleCreateWithInput = () => {
   checkApiKeyAndNavigate(() => {
-    const name = inputText.value.trim() || '未命名项目'
+    const name = inputText.value.trim() || 'Proyek tanpa nama'
     const id = createProject(name)
     // Store the input text to be used as initial prompt
     sessionStorage.setItem('ai-canvas-initial-prompt', inputText.value.trim())

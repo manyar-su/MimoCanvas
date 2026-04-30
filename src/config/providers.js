@@ -3,10 +3,37 @@
  * 适配不同 API 提供商的请求参数和响应格式
  */
 
+const parseSizeToDimensions = (size) => {
+  if (!size) return { width: 1024, height: 1024 }
+
+  const normalized = String(size).trim()
+  const directMatch = normalized.match(/^(\d+)x(\d+)$/i)
+  if (directMatch) {
+    return {
+      width: Number(directMatch[1]),
+      height: Number(directMatch[2])
+    }
+  }
+
+  const ratioMatch = normalized.match(/^(\d+):?x?(\d+)$/i)
+  if (ratioMatch) {
+    const w = Number(ratioMatch[1])
+    const h = Number(ratioMatch[2])
+    const base = 1024
+    if (!w || !h) return { width: base, height: base }
+    if (w >= h) {
+      return { width: base, height: Math.round((base * h) / w) }
+    }
+    return { width: Math.round((base * w) / h), height: base }
+  }
+
+  return { width: 1024, height: 1024 }
+}
+
 // 渠道适配配置
 export const PROVIDERS = {
   chatfire: {
-    label: '火宝 (Chatfire)',
+    label: 'Mimo (Chatfire)',
     defaultBaseUrl: 'https://api.chatfire.site',
     // 端点路径
     endpoints: {
@@ -166,6 +193,187 @@ export const PROVIDERS = {
           ...response
         }
       }
+    }
+  },
+  sumopod: {
+    label: 'Sumopod',
+    defaultBaseUrl: 'https://api.sumopod.com',
+    endpoints: {
+      chat: '/v1/chat/completions',
+      image: '/v1/images/generations',
+      video: '/v1/videos',
+      videoQuery: '/v1/videos/{taskId}'
+    },
+    requestAdapter: {
+      chat: (params) => {
+        const adapted = {
+          model: params.model,
+          messages: params.messages
+        }
+        if (params.temperature !== undefined) adapted.temperature = params.temperature
+        if (params.max_tokens !== undefined) adapted.max_tokens = params.max_tokens
+        if (params.stream !== undefined) adapted.stream = params.stream
+        return adapted
+      },
+      image: (params) => {
+        const adapted = {
+          model: params.model,
+          prompt: params.prompt
+        }
+        if (params.size) adapted.size = params.size
+        if (params.n) adapted.n = params.n
+        if (params.quality) adapted.quality = params.quality
+        if (params.style) adapted.style = params.style
+        if (params.image) adapted.image = params.image
+        return adapted
+      },
+      video: (params) => {
+        const adapted = {
+          model: params.model,
+          prompt: params.prompt || ''
+        }
+        if (params.first_frame_image) adapted.first_frame_image = params.first_frame_image
+        if (params.last_frame_image) adapted.last_frame_image = params.last_frame_image
+        if (params.size) adapted.size = params.size
+        if (params.seconds) adapted.seconds = params.seconds
+        return adapted
+      }
+    },
+    responseAdapter: {
+      chat: (response) => {
+        if (response.choices && response.choices.length > 0) {
+          return response.choices[0].message?.content || ''
+        }
+        return ''
+      },
+      image: (response) => {
+        const data = response.data || response
+        return (Array.isArray(data) ? data : [data]).map(item => ({
+          url: item.url || item.b64_json || '',
+          revisedPrompt: item.revised_prompt || ''
+        }))
+      },
+      video: (response) => {
+        return {
+          url: response.data?.url || response.url || response.data?.[0]?.url || '',
+          ...response
+        }
+      }
+    }
+  },
+  runpodChat: {
+    label: 'Runpod Chat',
+    defaultBaseUrl: 'https://api.runpod.ai/v2/YOUR_ENDPOINT_ID/openai/v1',
+    endpoints: {
+      chat: '/chat/completions',
+      image: '/images/generations',
+      video: '/videos',
+      videoQuery: '/videos/{taskId}'
+    },
+    requestAdapter: {
+      chat: (params) => {
+        const adapted = {
+          model: params.model,
+          messages: params.messages
+        }
+        if (params.temperature !== undefined) adapted.temperature = params.temperature
+        if (params.max_tokens !== undefined) adapted.max_tokens = params.max_tokens
+        if (params.stream !== undefined) adapted.stream = params.stream
+        return adapted
+      },
+      image: (params) => ({
+        model: params.model,
+        prompt: params.prompt,
+        size: params.size
+      }),
+      video: (params) => ({
+        model: params.model,
+        prompt: params.prompt || ''
+      })
+    },
+    responseAdapter: {
+      chat: (response) => {
+        if (response.choices && response.choices.length > 0) {
+          return response.choices[0].message?.content || ''
+        }
+        return ''
+      },
+      image: (response) => {
+        const data = response.data || response
+        return (Array.isArray(data) ? data : [data]).map(item => ({
+          url: item.url || item.b64_json || '',
+          revisedPrompt: item.revised_prompt || ''
+        }))
+      },
+      video: (response) => ({
+        url: response.data?.url || response.url || response.data?.[0]?.url || '',
+        ...response
+      })
+    }
+  },
+  runpodImage: {
+    label: 'Runpod Image',
+    defaultBaseUrl: 'https://api.runpod.ai/v2',
+    endpoints: {
+      chat: '/unsupported',
+      image: '/runsync',
+      video: '/unsupported',
+      videoQuery: '/unsupported'
+    },
+    requestAdapter: {
+      chat: (params) => params,
+      image: (params) => {
+        if (params.model === 'google-nano-banana-2-edit') {
+          return {
+            input: {
+              prompt: params.prompt,
+              images: params.image ? [params.image] : [],
+              resolution: '1k',
+              output_format: 'png',
+              enable_safety_checker: true
+            },
+            __endpoint: `/${params.model}/runsync`
+          }
+        }
+
+        if (params.model === 'wan-2-6-t2i') {
+          return {
+            input: {
+              prompt: params.prompt,
+              size: '1024*1024',
+              seed: -1,
+              enable_safety_checker: true
+            },
+            __endpoint: `/${params.model}/run`
+          }
+        }
+
+        const { width, height } = parseSizeToDimensions(params.size)
+        return {
+          input: {
+            prompt: params.prompt,
+            width,
+            height,
+            ...(params.image ? { image: params.image } : {})
+          },
+          __endpoint: `/${params.model}/runsync`
+        }
+      },
+      video: (params) => params
+    },
+    responseAdapter: {
+      chat: (response) => response,
+      image: (response) => {
+        const imageUrl =
+          response?.output?.image_url ||
+          response?.output?.imageUrl ||
+          response?.output?.result ||
+          response?.image_url ||
+          response?.url ||
+          ''
+        return [{ url: imageUrl, revisedPrompt: '' }]
+      },
+      video: (response) => response
     }
   },
   openai: {

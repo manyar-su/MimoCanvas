@@ -53,11 +53,11 @@ const props = defineProps({
 
 // Order labels | 顺序标签
 const orderLabels = [
-  { label: '① 第一个', key: 1 },
-  { label: '② 第二个', key: 2 },
-  { label: '③ 第三个', key: 3 },
-  { label: '④ 第四个', key: 4 },
-  { label: '⑤ 第五个', key: 5 }
+  { label: '① Pertama', key: 1 },
+  { label: '② Kedua', key: 2 },
+  { label: '③ Ketiga', key: 3 },
+  { label: '④ Keempat', key: 4 },
+  { label: '⑤ Kelima', key: 5 }
 ]
 
 // Dynamic order options based on connected edges count | 基于连接边数量的动态顺序选项

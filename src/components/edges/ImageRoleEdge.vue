@@ -55,9 +55,9 @@ const props = defineProps({
 
 // Image role options | 图片角色选项
 const imageRoleOptions = [
-  { label: '首帧', key: 'first_frame_image' },
-  { label: '尾帧', key: 'last_frame_image' },
-  { label: '参考图', key: 'input_reference' }
+  { label: 'Frame awal', key: 'first_frame_image' },
+  { label: 'Frame akhir', key: 'last_frame_image' },
+  { label: 'Gambar referensi', key: 'input_reference' }
 ]
 
 // Current role from edge data | 从边数据获取当前角色
@@ -66,7 +66,7 @@ const currentRole = computed(() => props.data?.imageRole || 'first_frame_image')
 // Current role label | 当前角色标签
 const currentRoleLabel = computed(() => {
   const option = imageRoleOptions.find(o => o.key === currentRole.value)
-  return option?.label || '首帧'
+  return option?.label || 'Frame awal'
 })
 
 // Calculate bezier path | 计算贝塞尔路径

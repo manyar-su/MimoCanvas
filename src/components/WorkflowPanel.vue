@@ -9,12 +9,12 @@
             class="tab-item" 
             :class="{ active: activeTab === 'public' }"
             @click="activeTab = 'public'"
-          >公共工作流</span>
+          >Workflow publik</span>
           <span 
             class="tab-item" 
             :class="{ active: activeTab === 'my' }"
             @click="activeTab = 'my'"
-          >我的工作流</span>
+          >Workflow saya</span>
         </div>
         <button class="expand-btn" @click="visible = false">
           <n-icon :size="16"><CloseOutline /></n-icon>
@@ -46,7 +46,7 @@
           <n-icon :size="36" class="text-gray-500">
             <FolderOpenOutline />
           </n-icon>
-          <p class="text-gray-500 text-sm mt-2">暂无自定义工作流</p>
+          <p class="text-gray-500 text-sm mt-2">Belum ada workflow kustom</p>
         </div>
       </div>
     </div>

@@ -22,7 +22,7 @@
           @click="showDownloadModal = true"
           class="p-2 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
           :class="{ 'text-[var(--accent-color)]': hasDownloadableAssets }"
-          title="批量下载素材"
+          title="Unduh aset massal"
         >
           <n-icon :size="20"><DownloadOutline /></n-icon>
         </button>
@@ -30,7 +30,7 @@
           @click="showApiSettings = true"
           class="p-2 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
           :class="{ 'text-[var(--accent-color)]': isApiConfigured }"
-          title="API 设置"
+          title="Pengaturan API"
         >
           <n-icon :size="20"><SettingsOutline /></n-icon>
         </button>
@@ -73,14 +73,14 @@
         <button 
           @click="showNodeMenu = !showNodeMenu"
           class="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--accent-color)] text-white hover:bg-[var(--accent-hover)] transition-colors"
-          title="添加节点"
+          title="Tambah node"
         >
           <n-icon :size="20"><AddOutline /></n-icon>
         </button>
         <button 
           @click="showWorkflowPanel = true"
           class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-[var(--bg-tertiary)] transition-colors"
-          title="工作流模板"
+          title="Template workflow"
         >
           <n-icon :size="20"><AppsOutline /></n-icon>
         </button>
@@ -126,7 +126,7 @@
         <button 
           @click="fitView({ padding: 0.2 })" 
           class="p-2 hover:bg-[var(--bg-tertiary)] rounded transition-colors"
-          title="适应视图"
+          title="Sesuaikan tampilan"
         >
           <n-icon :size="16"><LocateOutline /></n-icon>
         </button>
@@ -150,7 +150,7 @@
         >
           <div class="flex items-center gap-2 text-sm text-[var(--accent-color)] mb-2">
             <n-spin :size="14" />
-            <span>正在生成提示词...</span>
+            <span>Sedang membuat prompt...</span>
           </div>
           <div v-if="currentResponse" class="text-sm text-[var(--text-primary)] whitespace-pre-wrap">
             {{ currentResponse }}
@@ -173,15 +173,15 @@
                 @click="handlePolish"
                 :disabled="isProcessing || !chatInput.trim()"
                 class="px-3 py-1.5 text-xs rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="AI 润色提示词"
+                title="Perhalus prompt dengan AI"
               >
-                ✨ AI 润色
+                AI Polish
               </button>
             </div>
             <div class="flex items-center gap-3">
               <label class="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                 <n-switch v-model:value="autoExecute" size="small" />
-                自动执行
+                Eksekusi otomatis
               </label>
               <button 
                 @click="sendMessage"
@@ -197,7 +197,7 @@
         
         <!-- Quick suggestions | 快捷建议 -->
         <div class="flex flex-wrap items-center justify-center gap-2 mt-2">
-          <span class="text-xs text-[var(--text-secondary)]">推荐：</span>
+          <span class="text-xs text-[var(--text-secondary)]">Rekomendasi:</span>
           <button 
             v-for="tag in suggestions" 
             :key="tag"
@@ -217,20 +217,20 @@
     <ApiSettings v-model:show="showApiSettings" />
 
     <!-- Rename Modal | 重命名弹窗 -->
-    <n-modal v-model:show="showRenameModal" preset="dialog" title="重命名项目">
-      <n-input v-model:value="renameValue" placeholder="请输入项目名称" />
+    <n-modal v-model:show="showRenameModal" preset="dialog" title="Ganti nama proyek">
+      <n-input v-model:value="renameValue" placeholder="Masukkan nama proyek" />
       <template #action>
-        <n-button @click="showRenameModal = false">取消</n-button>
-        <n-button type="primary" @click="confirmRename">确定</n-button>
+        <n-button @click="showRenameModal = false">Batal</n-button>
+        <n-button type="primary" @click="confirmRename">Simpan</n-button>
       </template>
     </n-modal>
 
     <!-- Delete Confirm Modal | 删除确认弹窗 -->
-    <n-modal v-model:show="showDeleteModal" preset="dialog" title="删除项目" type="warning">
-      <p>确定要删除项目「{{ projectName }}」吗？此操作不可恢复。</p>
+    <n-modal v-model:show="showDeleteModal" preset="dialog" title="Hapus proyek" type="warning">
+      <p>Yakin ingin menghapus proyek "{{ projectName }}"? Tindakan ini tidak dapat dibatalkan.</p>
       <template #action>
-        <n-button @click="showDeleteModal = false">取消</n-button>
-        <n-button type="error" @click="confirmDelete">删除</n-button>
+        <n-button @click="showDeleteModal = false">Batal</n-button>
+        <n-button type="error" @click="confirmDelete">Hapus</n-button>
       </template>
     </n-modal>
 
@@ -298,13 +298,13 @@ onMounted(() => {
 // Chat templates | 问答模板
 const CHAT_TEMPLATES = {
   imagePrompt: {
-    name: '生图提示词',
-    systemPrompt: '你是一个专业的AI绘画提示词专家。将用户输入的内容美化成高质量的生图提示词，包含风格、光线、構图、细节等要素。直接返回提示词，不要其他解释。',
+    name: 'Prompt gambar',
+    systemPrompt: 'Anda adalah ahli prompt ilustrasi AI profesional. Ubah masukan pengguna menjadi prompt gambar berkualitas tinggi yang mencakup gaya, pencahayaan, komposisi, dan detail. Kembalikan hanya prompt tanpa penjelasan tambahan.',
     model: 'gpt-4o-mini'
   },
   videoPrompt: {
-    name: '视频提示词',
-    systemPrompt: '你是一个专业的AI视频提示词专家。将用户输入的内容美化成高质量的视频生成提示词，包含运动、场景、镜头等要素。直接返回提示词，不要其他解释。',
+    name: 'Prompt video',
+    systemPrompt: 'Anda adalah ahli prompt video AI profesional. Ubah masukan pengguna menjadi prompt pembuatan video berkualitas tinggi yang mencakup gerakan, adegan, dan arahan kamera. Kembalikan hanya prompt tanpa penjelasan tambahan.',
     model: 'gpt-4o-mini'
   }
 }
@@ -401,45 +401,45 @@ const hasDownloadableAssets = computed(() => {
 // Project info | 项目信息
 const projectName = computed(() => {
   const project = projects.value.find(p => p.id === route.params.id)
-  return project?.name || '未命名项目'
+  return project?.name || 'Proyek tanpa nama'
 })
 
 // Project dropdown options | 项目下拉选项
 const projectOptions = [
-  { label: '重命名', key: 'rename' },
-  { label: '复制', key: 'duplicate' },
-  { label: '删除', key: 'delete' }
+  { label: 'Ganti nama', key: 'rename' },
+  { label: 'Duplikat', key: 'duplicate' },
+  { label: 'Hapus', key: 'delete' }
 ]
 
 // Toolbar tools | 工具栏工具
 const tools = [
-  { id: 'text', name: '文本', icon: TextOutline, action: () => addNewNode('text') },
-  { id: 'image', name: '图片', icon: ImageOutline, action: () => addNewNode('image') },
-  { id: 'imageConfig', name: '文生图', icon: ColorPaletteOutline, action: () => addNewNode('imageConfig') },
-  { id: 'videoConfig', name: '视频生成', icon: VideocamOutline, action: () => addNewNode('videoConfig') },
-  { id: 'undo', name: '撤销', icon: ArrowUndoOutline, action: () => undo(), disabled: () => !canUndo() },
-  { id: 'redo', name: '重做', icon: ArrowRedoOutline, action: () => redo(), disabled: () => !canRedo() }
+  { id: 'text', name: 'Teks', icon: TextOutline, action: () => addNewNode('text') },
+  { id: 'image', name: 'Gambar', icon: ImageOutline, action: () => addNewNode('image') },
+  { id: 'imageConfig', name: 'Teks ke gambar', icon: ColorPaletteOutline, action: () => addNewNode('imageConfig') },
+  { id: 'videoConfig', name: 'Pembuatan video', icon: VideocamOutline, action: () => addNewNode('videoConfig') },
+  { id: 'undo', name: 'Urungkan', icon: ArrowUndoOutline, action: () => undo(), disabled: () => !canUndo() },
+  { id: 'redo', name: 'Ulangi', icon: ArrowRedoOutline, action: () => redo(), disabled: () => !canRedo() }
 ]
 
 // Node type options for menu | 节点类型菜单选项
 const nodeTypeOptions = [
-  { type: 'text', name: '文本节点', icon: TextOutline, color: '#3b82f6' },
-  { type: 'llmConfig', name: 'LLM文本生成', icon: ChatbubbleOutline, color: '#a855f7' },
-  { type: 'imageConfig', name: '文生图配置', icon: ColorPaletteOutline, color: '#22c55e' },
-  { type: 'videoConfig', name: '视频生成配置', icon: VideocamOutline, color: '#f59e0b' },
-  { type: 'image', name: '图片节点', icon: ImageOutline, color: '#8b5cf6' },
-  { type: 'video', name: '视频节点', icon: VideocamOutline, color: '#ef4444' }
+  { type: 'text', name: 'Node teks', icon: TextOutline, color: '#3b82f6' },
+  { type: 'llmConfig', name: 'Pembuatan teks LLM', icon: ChatbubbleOutline, color: '#a855f7' },
+  { type: 'imageConfig', name: 'Konfigurasi teks ke gambar', icon: ColorPaletteOutline, color: '#22c55e' },
+  { type: 'videoConfig', name: 'Konfigurasi video', icon: VideocamOutline, color: '#f59e0b' },
+  { type: 'image', name: 'Node gambar', icon: ImageOutline, color: '#8b5cf6' },
+  { type: 'video', name: 'Node video', icon: VideocamOutline, color: '#ef4444' }
 ]
 
 // Input placeholder | 输入占位符
-const inputPlaceholder = '你可以试着说"帮我生成一个二次元的卡通角色"'
+const inputPlaceholder = 'Coba ketik "Bantu saya membuat karakter kartun bergaya anime"'
 
 // Quick suggestions | 快捷建议
 const suggestions = [
-  '像个魔法森林',
-  '三只不同的小猫',
-  '生成多角度分镜',
-  '夏日田野环绕漫步'
+  'Hutan ajaib',
+  'Tiga anak kucing yang berbeda',
+  'Buat storyboard multi-sudut',
+  'Jalan santai di hamparan sawah musim panas'
 ]
 
 // Add new node | 添加新节点
@@ -514,7 +514,7 @@ const handleAddWorkflow = ({ workflow, options }) => {
     })
   }, 100)
 
-  window.$message?.success(`已添加工作流: ${workflow.name}`)
+  window.$message?.success(`Workflow ditambahkan: ${workflow.name}`)
 }
 
 // Handle connection | 处理连接
@@ -649,7 +649,7 @@ const handleProjectAction = (key) => {
       break
     case 'duplicate':
       // TODO: Implement duplicate
-      window.$message?.info('复制功能开发中')
+      window.$message?.info('Fitur duplikat masih dalam pengembangan')
       break
     case 'delete':
       showDeleteModal.value = true
@@ -662,7 +662,7 @@ const confirmRename = () => {
   const projectId = route.params.id
   if (renameValue.value.trim()) {
     renameProject(projectId, renameValue.value.trim())
-    window.$message?.success('已重命名')
+    window.$message?.success('Nama proyek diperbarui')
   }
   showRenameModal.value = false
 }
@@ -672,7 +672,7 @@ const confirmDelete = () => {
   const projectId = route.params.id
   // deleteProject(projectId) // TODO: import deleteProject
   showDeleteModal.value = false
-  window.$message?.success('项目已删除')
+  window.$message?.success('Proyek dihapus')
   router.push('/')
 }
 
@@ -689,7 +689,7 @@ const handlePolish = async () => {
   
   // Check API configuration | 检查 API 配置
   if (!isApiConfigured.value) {
-    window.$message?.warning('请先配置 API Key')
+    window.$message?.warning('Silakan konfigurasikan API Key terlebih dahulu')
     showApiSettings.value = true
     return
   }
@@ -703,11 +703,11 @@ const handlePolish = async () => {
     
     if (result) {
       chatInput.value = result
-      window.$message?.success('提示词已润色')
+      window.$message?.success('Prompt berhasil diperhalus')
     }
   } catch (err) {
     chatInput.value = originalInput
-    window.$message?.error(err.message || '润色失败')
+    window.$message?.error(err.message || 'Gagal memperhalus prompt')
   } finally {
     isProcessing.value = false
   }
@@ -720,7 +720,7 @@ const sendMessage = async () => {
 
   // Check API configuration | 检查 API 配置
   if (!isApiConfigured.value) {
-    window.$message?.warning('请先配置 API Key')
+    window.$message?.warning('Silakan konfigurasikan API Key terlebih dahulu')
     showApiSettings.value = true
     return
   }
@@ -740,7 +740,7 @@ const sendMessage = async () => {
 
     if (autoExecute.value) {
       // Auto-execute mode: analyze intent and execute workflow | 自动执行模式：分析意图并执行工作流
-      window.$message?.info('正在分析工作流...')
+      window.$message?.info('Sedang menganalisis workflow...')
       
       try {
         // Analyze user intent | 分析用户意图
@@ -755,27 +755,27 @@ const sendMessage = async () => {
           shots: result?.shots
         }
         
-        window.$message?.info(`执行工作流: ${result?.description || '文生图'}`)
+        window.$message?.info(`Menjalankan workflow: ${result?.description || 'Teks ke gambar'}`)
         
         // Execute the workflow | 执行工作流
         await executeWorkflow(workflowParams, { x: baseX, y: baseY })
         
-        window.$message?.success('工作流已启动')
+        window.$message?.success('Workflow dimulai')
       } catch (err) {
         console.error('Workflow error:', err)
         // Fallback to simple text-to-image | 回退到文生图
-        window.$message?.warning('使用默认文生图工作流')
+        window.$message?.warning('Menggunakan workflow teks ke gambar bawaan')
         await createTextToImageWorkflow(content, { x: baseX, y: baseY })
       }
     } else {
       // Manual mode: just create nodes | 手动模式：仅创建节点
       const textNodeId = addNode('text', { x: baseX, y: baseY }, { 
         content: content, 
-        label: '提示词' 
+        label: 'Prompt' 
       })
       
       const imageConfigNodeId = addNode('imageConfig', { x: baseX + 400, y: baseY }, {
-        label: '文生图'
+        label: 'Teks ke gambar'
       })
       
       addEdge({
@@ -786,7 +786,7 @@ const sendMessage = async () => {
       })
     }
   } catch (err) {
-    window.$message?.error(err.message || '创建失败')
+    window.$message?.error(err.message || 'Gagal membuat node')
   } finally {
     isProcessing.value = false
   }
