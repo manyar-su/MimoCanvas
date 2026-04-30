@@ -35,6 +35,11 @@ html, body, #app {
   --border-color: #e2e8f0;
   --accent-color: #22c55e;
   --accent-hover: #16a34a;
+  --edge-default: #94a3b8;
+  --edge-prompt: #16a34a;
+  --edge-image-order: #2563eb;
+  --edge-image-role: #7c3aed;
+  --node-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
 }
 
 /* Dark mode variables | 深色模式变量 */
@@ -47,6 +52,11 @@ html, body, #app {
   --border-color: #334155;
   --accent-color: #4ade80;
   --accent-hover: #22c55e;
+  --edge-default: #64748b;
+  --edge-prompt: #22c55e;
+  --edge-image-order: #60a5fa;
+  --edge-image-role: #a78bfa;
+  --node-shadow: 0 8px 24px rgba(2, 6, 23, 0.35);
 }
 
 body {
@@ -62,20 +72,38 @@ body {
 
 .vue-flow__node {
   border-radius: 8px;
-  /* box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); */
+  box-shadow: var(--node-shadow);
 }
 .vue-flow__node.selected {
   /* border: 1px solid green; */
 }
 
 .vue-flow__edge-path {
-  stroke: var(--border-color);
-  stroke-width: 2;
+  stroke: var(--edge-default);
+  stroke-width: 2.4;
+  opacity: 0.95;
+}
+
+.vue-flow__connection-path {
+  stroke: var(--accent-color);
+  stroke-width: 2.2;
+  stroke-dasharray: 5 4;
+}
+
+.vue-flow__edge.selected .vue-flow__edge-path,
+.vue-flow__edge:hover .vue-flow__edge-path {
+  stroke-width: 2.8;
+  opacity: 1;
 }
 
 .vue-flow__handle {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   background-color: var(--accent-color) !important;
   border: 2px solid var(--bg-secondary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 24%, transparent);
+}
+
+.vue-flow__background-pattern {
+  color: color-mix(in srgb, var(--text-secondary) 22%, transparent);
 }

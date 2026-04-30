@@ -18,7 +18,8 @@
         size="small"
       >
         <button 
-          class="flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full bg-blue-500 text-white border-2 border-white shadow-md hover:scale-110 transition-transform"
+          class="flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full text-white border-2 shadow-md hover:scale-110 transition-transform"
+          style="background: var(--edge-image-order); border-color: var(--bg-secondary);"
         >
           {{ currentOrder }}
         </button>
@@ -120,8 +121,8 @@ const labelY = computed(() => (props.sourceY + props.targetY) / 2)
 
 // Edge style | 边样式
 const edgeStyle = computed(() => ({
-  stroke: '#3b82f6',
-  strokeWidth: 2,
+  stroke: 'var(--edge-image-order)',
+  strokeWidth: 2.6,
   ...props.style
 }))
 

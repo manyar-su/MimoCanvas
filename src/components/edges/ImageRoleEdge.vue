@@ -18,7 +18,8 @@
         size="small"
       >
         <button 
-          class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow transition-shadow"
+          class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border shadow-sm hover:shadow transition-shadow"
+          style="background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-color);"
         >
           {{ currentRoleLabel }}
           <n-icon :size="10"><ChevronDownOutline /></n-icon>
@@ -88,8 +89,8 @@ const labelY = computed(() => (props.sourceY + props.targetY) / 2)
 
 // Edge style | 边样式
 const edgeStyle = computed(() => ({
-  stroke: '#6366f1',
-  strokeWidth: 2,
+  stroke: 'var(--edge-image-role)',
+  strokeWidth: 2.6,
   ...props.style
 }))
 
