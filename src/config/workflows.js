@@ -769,6 +769,168 @@ Aturan:
 
       return { nodes, edges }
     }
+  },
+  {
+    id: 'ugc-influencer-avatar-to-video',
+    name: 'UGC influencer (avatar ke video)',
+    description: 'Alur sederhana: referensi avatar + simple prompt → avatar output → video output.',
+    icon: 'VideocamOutline',
+    category: 'creative',
+    createNodes: (startPosition) => {
+      const colSpacing = 360
+      const rowSpacing = 360
+      const nodes = []
+      const edges = []
+      let nodeIdCounter = 0
+      const getNodeId = () => `workflow_node_${Date.now()}_${nodeIdCounter++}`
+
+      const createLane = (laneIndex, laneTitle, promptText) => {
+        const laneY = startPosition.y + laneIndex * rowSpacing
+
+        const noteId = getNodeId()
+        const refId = getNodeId()
+        const avatarPromptId = getNodeId()
+        const avatarConfigId = getNodeId()
+        const avatarOutputId = getNodeId()
+        const videoPromptId = getNodeId()
+        const videoConfigId = getNodeId()
+        const videoOutputId = getNodeId()
+
+        nodes.push(
+          {
+            id: noteId,
+            type: 'text',
+            position: { x: startPosition.x, y: laneY - 130 },
+            data: {
+              label: `Note ${laneTitle}`,
+              content: `Langkah ${laneTitle}:\n1) Upload referensi wajah\n2) Generate avatar\n3) Generate video UGC` 
+            }
+          },
+          {
+            id: refId,
+            type: 'image',
+            position: { x: startPosition.x, y: laneY },
+            data: {
+              label: `Reference image ${laneTitle}`,
+              url: ''
+            }
+          },
+          {
+            id: avatarPromptId,
+            type: 'text',
+            position: { x: startPosition.x + colSpacing, y: laneY - 130 },
+            data: {
+              label: `Simple prompt avatar ${laneTitle}`,
+              content: 'Buat avatar influencer wanita usia 20-an, close-up selfie, natural light, wajah bersih, detail kulit natural, ekspresi percaya diri, look realistis, rasio portrait 9:16.'
+            }
+          },
+          {
+            id: avatarConfigId,
+            type: 'imageConfig',
+            position: { x: startPosition.x + colSpacing, y: laneY },
+            data: {
+              label: `Avatar clone ${laneTitle}`,
+              model: 'google-nano-banana-2-edit',
+              size: '9x16'
+            }
+          },
+          {
+            id: avatarOutputId,
+            type: 'image',
+            position: { x: startPosition.x + colSpacing * 2, y: laneY },
+            data: {
+              label: `Avatar output ${laneTitle}`,
+              url: ''
+            }
+          },
+          {
+            id: videoPromptId,
+            type: 'text',
+            position: { x: startPosition.x + colSpacing * 2, y: laneY - 130 },
+            data: {
+              label: `Simple prompt video ${laneTitle}`,
+              content: promptText
+            }
+          },
+          {
+            id: videoConfigId,
+            type: 'videoConfig',
+            position: { x: startPosition.x + colSpacing * 3, y: laneY },
+            data: {
+              label: `Video output ${laneTitle}`,
+              model: 'vidu-q3-i2v',
+              ratio: '9:16',
+              dur: 5,
+              resolution: '1080p'
+            }
+          },
+          {
+            id: videoOutputId,
+            type: 'video',
+            position: { x: startPosition.x + colSpacing * 4, y: laneY },
+            data: {
+              label: `Video result ${laneTitle}`,
+              url: ''
+            }
+          }
+        )
+
+        edges.push(
+          {
+            id: `edge_${avatarPromptId}_${avatarConfigId}`,
+            source: avatarPromptId,
+            target: avatarConfigId,
+            type: 'promptOrder',
+            data: { promptOrder: 1 },
+            sourceHandle: 'right',
+            targetHandle: 'left'
+          },
+          {
+            id: `edge_${refId}_${avatarConfigId}`,
+            source: refId,
+            target: avatarConfigId,
+            type: 'imageOrder',
+            data: { imageOrder: 1 },
+            sourceHandle: 'right',
+            targetHandle: 'left'
+          },
+          { id: `edge_${avatarConfigId}_${avatarOutputId}`, source: avatarConfigId, target: avatarOutputId, sourceHandle: 'right', targetHandle: 'left' },
+          {
+            id: `edge_${videoPromptId}_${videoConfigId}`,
+            source: videoPromptId,
+            target: videoConfigId,
+            type: 'promptOrder',
+            data: { promptOrder: 1 },
+            sourceHandle: 'right',
+            targetHandle: 'left'
+          },
+          {
+            id: `edge_${avatarOutputId}_${videoConfigId}`,
+            source: avatarOutputId,
+            target: videoConfigId,
+            type: 'imageRole',
+            data: { imageRole: 'first_frame_image' },
+            sourceHandle: 'right',
+            targetHandle: 'left'
+          },
+          { id: `edge_${videoConfigId}_${videoOutputId}`, source: videoConfigId, target: videoOutputId, sourceHandle: 'right', targetHandle: 'left' }
+        )
+      }
+
+      createLane(
+        0,
+        'A',
+        'Perempuan berbicara ke kamera selfie, natural, ekspresif, gaya UGC TikTok, bahasa Indonesia, tanpa subtitle, durasi pendek, gerakan kepala dan bibir natural.'
+      )
+
+      createLane(
+        1,
+        'B',
+        'Perempuan menatap kamera dengan hangat, menyampaikan ajakan singkat untuk live, gaya influencer UGC, potrait 9:16, tanpa teks overlay, kualitas video bersih.'
+      )
+
+      return { nodes, edges }
+    }
   }
 ]
 
@@ -781,4 +943,3 @@ export const getWorkflowsByCategory = (category) => {
 }
 
 export default WORKFLOW_TEMPLATES
-
