@@ -652,7 +652,6 @@ const handleGenerate = async (mode = 'auto') => {
 
   if (!isModelCompatible.value) {
     const reason = `Model tidak sesuai dengan provider aktif.\nModel: ${localModel.value}\nProvider: ${modelStore.currentProvider}`
-    window.$message?.error('Model tidak sesuai provider')
     showResultModal({ success: false, title: 'Generate gambar gagal', content: reason })
     return
   }
@@ -742,7 +741,6 @@ const handleGenerate = async (mode = 'auto') => {
       // Mark this config node as executed | 标记配置节点已执行
       updateNode(props.id, { executed: true, outputNodeId: imageNodeId })
     }
-    window.$message?.success('Gambar berhasil dibuat')
     showResultModal({
       success: true,
       title: 'Generate gambar berhasil',
@@ -760,7 +758,6 @@ const handleGenerate = async (mode = 'auto') => {
       error: reason,
       updatedAt: Date.now()
     })
-    window.$message?.error('Gagal membuat gambar')
     showResultModal({ success: false, title: 'Generate gambar gagal', content: reason })
   }
 }

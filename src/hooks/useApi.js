@@ -255,6 +255,7 @@ export const useVideoGeneration = () => {
     if (params.last_frame_image) requestData.last_frame_image = params.last_frame_image
     if (params.ratio) requestData.size = params.ratio
     if (params.dur) requestData.seconds = params.dur
+    if (params.resolution) requestData.resolution = params.resolution
 
     // 适配请求参数
     const adaptedParams = adaptRequest('video', requestData)

@@ -125,12 +125,29 @@ export const getModelDurationOptions = (modelKey) => {
  */
 export const getModelResolutionOptions = (modelKey) => {
   const model = VIDEO_MODELS.find(m => m.key === modelKey)
-  if (!model?.resolutions) return SEEDANCE_RESOLUTION_OPTIONS
+  if (!model?.resolutions) return []
 
   return model.resolutions.map(res => {
     const option = SEEDANCE_RESOLUTION_OPTIONS.find(o => o.key === res)
     return option || { label: res, key: res }
   })
+}
+
+/**
+ * Get video model capabilities | 获取视频模型能力
+ */
+export const getVideoModelCapabilities = (modelKey) => {
+  const model = VIDEO_MODELS.find(m => m.key === modelKey)
+  const type = model?.type || ''
+
+  return {
+    supportsTextPrompt: true,
+    supportsFirstFrame: type.includes('i2v'),
+    supportsLastFrame: Boolean(model?.supportsLastFrame),
+    supportsResolution: Array.isArray(model?.resolutions) && model.resolutions.length > 0,
+    supportsI2V: type.includes('i2v'),
+    supportsT2V: type.includes('t2v')
+  }
 }
 
 // Dropdown options (built-in + custom) | 下拉选项（内置 + 自定义）- 根据渠道过滤

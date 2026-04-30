@@ -441,15 +441,10 @@ const handleSelect = (item) => {
     const nodeX = currentNode?.position?.x || 0
     const nodeY = currentNode?.position?.y || 0
 
-    // Create text node for prompt
-    const textNodeId = addNode('text', { x: nodeX + 300, y: nodeY - 100 }, {
-      content: '',
-      label: 'Prompt'
-    })
-
     // Create videoConfig node
     const configNodeId = addNode('videoConfig', { x: nodeX + 600, y: nodeY }, {
-      label: 'Pembuatan video'
+      label: 'Konfigurasi video',
+      prompt: ''
     })
 
     // Connect image to videoConfig
@@ -462,15 +457,7 @@ const handleSelect = (item) => {
       data: { imageRole: 'first_frame_image' }
     })
 
-    // Connect text to videoConfig
-    addEdge({
-      source: textNodeId,
-      target: configNodeId,
-      sourceHandle: 'right',
-      targetHandle: 'left'
-    })
-
-    setTimeout(() => updateNodeInternals([textNodeId, configNodeId]), 50)
+    setTimeout(() => updateNodeInternals([configNodeId]), 50)
     window.$message?.success('Workflow pembuatan video berhasil dibuat')
   }
 }
@@ -921,15 +908,10 @@ const handleVideoGen = () => {
   const nodeX = currentNode?.position?.x || 0
   const nodeY = currentNode?.position?.y || 0
 
-  // Create text node for prompt | 创建文本节点用于提示词
-  const textNodeId = addNode('text', { x: nodeX + 300, y: nodeY - 100 }, {
-    content: '',
-    label: 'Prompt'
-  })
-
   // Create videoConfig node | 创建视频配置节点
   const configNodeId = addNode('videoConfig', { x: nodeX + 600, y: nodeY }, {
-    label: 'Pembuatan video'
+    label: 'Konfigurasi video',
+    prompt: ''
   })
 
   // Connect image node to config node with role | 连接图片节点到配置节点并设置角色
@@ -942,17 +924,9 @@ const handleVideoGen = () => {
     data: { imageRole: 'first_frame_image' } // Default to first frame | 默认首帧
   })
 
-  // Connect text node to config node | 连接文本节点到配置节点
-  addEdge({
-    source: textNodeId,
-    target: configNodeId,
-    sourceHandle: 'right',
-    targetHandle: 'left'
-  })
-
   // Force Vue Flow to recalculate node dimensions | 强制 Vue Flow 重新计算节点尺寸
   setTimeout(() => {
-    updateNodeInternals([textNodeId, configNodeId])
+    updateNodeInternals([configNodeId])
   }, 50)
 }
 </script>

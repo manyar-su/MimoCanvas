@@ -214,7 +214,6 @@ const startPolling = async (taskId) => {
       label: '视频生成',
       taskId: null  // 清除 taskId
     })
-    window.$message?.success('视频生成成功')
     showResultModal({ success: true, title: 'Generate video berhasil', content: 'Video selesai diproses dan siap dipreview.' })
   } catch (err) {
     const reason = buildFailureReason(err, { model: props.data?.model })
@@ -225,7 +224,6 @@ const startPolling = async (taskId) => {
       label: '生成失败',
       taskId: null  // 清除 taskId
     })
-    window.$message?.error('Video gagal diproses')
     showResultModal({ success: false, title: 'Generate video gagal', content: reason })
   } finally {
     isPolling.value = false

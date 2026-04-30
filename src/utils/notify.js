@@ -39,19 +39,25 @@ export const buildFailureReason = (err, ctx = {}) => {
   ].filter(Boolean).join('\n')
 }
 
-export const showResultModal = ({ success = true, title, content }) => {
-  if (window.$dialog) {
-    const fn = success ? window.$dialog.success : window.$dialog.error
-    fn({
-      title: title || (success ? 'Berhasil' : 'Gagal'),
-      content,
-      positiveText: 'OK'
-    })
-    return
-  }
+let lastToastKey = ''
+let lastToastAt = 0
 
-  if (window.$message) {
-    if (success) window.$message.success(content)
-    else window.$message.error(content)
+const shouldSkipDuplicate = (key) => {
+  const now = Date.now()
+  if (key && key === lastToastKey && now - lastToastAt < 1200) {
+    return true
   }
+  lastToastKey = key
+  lastToastAt = now
+  return false
+}
+
+export const showResultModal = ({ success = true, title, content }) => {
+  if (!window.$message) return
+  const text = [title, content].filter(Boolean).join(' - ')
+  const key = `${success ? 'ok' : 'err'}:${text}`
+  if (shouldSkipDuplicate(key)) return
+
+  if (success) window.$message.success(text)
+  else window.$message.error(text)
 }

@@ -8,7 +8,16 @@ import App from './App.vue'
 import router from './router'
 import './style.css'
 
-const { message, dialog } = createDiscreteApi(['message', 'dialog'])
+const { message, dialog } = createDiscreteApi(
+  ['message', 'dialog'],
+  {
+    messageProviderProps: {
+      placement: 'top-right',
+      max: 1,
+      duration: 2500
+    }
+  }
+)
 window.$message = message
 window.$dialog = dialog
 

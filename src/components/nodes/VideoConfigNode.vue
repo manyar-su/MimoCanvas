@@ -48,6 +48,17 @@
           </n-dropdown>
         </div>
 
+        <!-- Prompt input -->
+        <div class="space-y-1">
+          <span class="text-xs text-[var(--text-secondary)]">Prompt video</span>
+          <textarea
+            v-model="localPrompt"
+            @blur="syncLocalPrompt"
+            placeholder="Masukkan prompt video di sini"
+            class="w-full min-h-[72px] max-h-[160px] resize-y rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] px-2 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-color)]"
+          />
+        </div>
+
         <!-- Aspect ratio selector | 宽高比选择 -->
         <div class="flex items-center justify-between">
           <span class="text-xs text-[var(--text-secondary)]">Rasio</span>
@@ -74,6 +85,19 @@
           </n-dropdown>
         </div>
 
+        <!-- Resolution selector -->
+        <div v-if="resolutionOptions.length > 0" class="flex items-center justify-between">
+          <span class="text-xs text-[var(--text-secondary)]">Resolusi</span>
+          <n-dropdown :options="resolutionOptions" @select="handleResolutionSelect">
+            <button class="flex items-center gap-1 text-sm text-[var(--text-primary)] hover:text-[var(--accent-color)]">
+              {{ localResolution }}
+              <n-icon :size="12">
+                <ChevronForwardOutline />
+              </n-icon>
+            </button>
+          </n-dropdown>
+        </div>
+
         <!-- Connected inputs indicator | 连接输入指示 -->
         <div
           class="flex items-center gap-2 text-xs text-[var(--text-secondary)] py-1 border-t border-[var(--border-color)]">
@@ -83,16 +107,21 @@
           </span>
           <span class="px-2 py-0.5 rounded-full"
             :class="imagesByRole.firstFrame ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">
-            首帧 {{ imagesByRole.firstFrame ? '✓' : '○' }}
+            First frame {{ imagesByRole.firstFrame ? '✓' : '○' }}
           </span>
           <span class="px-2 py-0.5 rounded-full"
             :class="imagesByRole.lastFrame ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">
-            尾帧 {{ imagesByRole.lastFrame ? '✓' : '○' }}
+            End frame {{ supportsLastFrame ? (imagesByRole.lastFrame ? '✓' : '○') : 'n/a' }}
           </span>
           <span class="px-2 py-0.5 rounded-full"
             :class="imagesByRole.referenceImages.length > 0 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'">
             Referensi {{ imagesByRole.referenceImages.length > 0 ? `✓ ${imagesByRole.referenceImages.length}` : '○' }}
           </span>
+        </div>
+
+        <div class="text-[11px] text-[var(--text-secondary)]">
+          <span v-if="supportsLastFrame">Model ini mendukung end frame (hubungkan node gambar kedua sebagai end frame).</span>
+          <span v-else>Model ini tidak mendukung end frame.</span>
         </div>
 
         <!-- Progress bar | 进度条 -->
@@ -151,7 +180,7 @@ import { useVideoGeneration } from '../../hooks'
 import { updateNode, removeNode, duplicateNode, addNode, addEdge, nodes, edges } from '../../stores/canvas'
 import NodeHandleMenu from './NodeHandleMenu.vue'
 import { useModelStore } from '../../stores/pinia'
-import { getModelRatioOptions, getModelDurationOptions, getModelConfig, DEFAULT_VIDEO_MODEL } from '../../stores/models'
+import { getModelRatioOptions, getModelDurationOptions, getModelResolutionOptions, getVideoModelCapabilities, getModelConfig, DEFAULT_VIDEO_MODEL } from '../../stores/models'
 import { buildFailureReason, showResultModal } from '../../utils/notify'
 
 // 使用 Pinia store 获取模型选项（根据渠道过滤）
@@ -177,6 +206,8 @@ const isGenerating = ref(false)  // 任务创建中状态
 const localModel = ref(props.data?.model || DEFAULT_VIDEO_MODEL)
 const localRatio = ref(props.data?.ratio || '16:9')
 const localDuration = ref(props.data?.dur || 5)
+const localResolution = ref(props.data?.resolution || getModelConfig(localModel.value)?.defaultResolution || '')
+const localPrompt = ref(props.data?.prompt || '')
 
 // Label editing state | Label 编辑状态
 const isEditingLabel = ref(false)
@@ -219,9 +250,28 @@ const imagesByRole = computed(() => {
 
 // Get current model config | 获取当前模型配置
 const currentModelConfig = computed(() => getModelConfig(localModel.value))
+const currentCapabilities = computed(() => getVideoModelCapabilities(localModel.value))
+const supportsLastFrame = computed(() => currentCapabilities.value.supportsLastFrame)
+const hasFirstFrameConnected = computed(() => !!imagesByRole.value.firstFrame)
 
 // Model options from Pinia store (filtered by provider) | 从 Pinia store 获取模型选项（根据渠道过滤）
-const modelOptions = computed(() => modelStore.allVideoModelOptions)
+const modelOptions = computed(() => {
+  const availableKeys = new Set(modelStore.availableVideoModels.map(m => m.key))
+  return modelStore.allVideoModels.map((m) => {
+    const caps = getVideoModelCapabilities(m.key)
+    const disabledByProvider = !availableKeys.has(m.key)
+    const disabledByFlow = hasFirstFrameConnected.value ? !caps.supportsI2V : false
+    const disabled = disabledByProvider || disabledByFlow
+    const reason = disabledByProvider
+      ? 'provider tidak cocok'
+      : (disabledByFlow ? 'tidak support image→video' : '')
+    return {
+      label: reason ? `${m.label} (${reason})` : m.label,
+      key: m.key,
+      disabled
+    }
+  })
+})
 const isModelCompatible = computed(() => modelStore.availableVideoModels.some(m => m.key === localModel.value))
 
 // Display model name | 显示模型名称
@@ -245,8 +295,18 @@ const durationOptions = computed(() => {
   return getModelDurationOptions(localModel.value)
 })
 
+const resolutionOptions = computed(() => {
+  return getModelResolutionOptions(localModel.value)
+})
+
 // Handle model selection | 处理模型选择
 const handleModelSelect = (key) => {
+  const selected = modelOptions.value.find(m => m.key === key)
+  if (selected?.disabled) {
+    window.$message?.warning('Model ini tidak support image ke video')
+    return
+  }
+
   localModel.value = key
   // Update ratio and duration to model's default | 更新为模型默认比例和时长
   const config = getModelConfig(key)
@@ -259,6 +319,22 @@ const handleModelSelect = (key) => {
     localDuration.value = config.defaultParams.duration
     updates.dur = config.defaultParams.duration
   }
+
+  const newResOptions = getModelResolutionOptions(key)
+  const defaultResolution = config?.defaultResolution || config?.defaultParams?.resolution || newResOptions[0]?.key || ''
+  localResolution.value = defaultResolution
+  updates.resolution = defaultResolution
+
+  // Jika model tidak support end frame, putuskan edge end frame yang sudah ada
+  const caps = getVideoModelCapabilities(key)
+  if (!caps.supportsLastFrame) {
+    const targetEdges = edges.value.filter(e => e.target === props.id && e.data?.imageRole === 'last_frame_image')
+    if (targetEdges.length > 0) {
+      const removeIds = new Set(targetEdges.map(e => e.id))
+      edges.value = edges.value.filter(e => !removeIds.has(e.id))
+    }
+  }
+
   updateNode(props.id, updates)
 }
 
@@ -285,11 +361,23 @@ const handleDurationSelect = (key) => {
   updateNode(props.id, { dur: key })
 }
 
+const handleResolutionSelect = (key) => {
+  localResolution.value = key
+  updateNode(props.id, { resolution: key })
+}
+
+const syncLocalPrompt = () => {
+  updateNode(props.id, { prompt: localPrompt.value })
+}
+
 // Get connected inputs by role | 根据角色获取连接的输入
 const getConnectedInputs = () => {
   const connectedEdges = edges.value.filter(e => e.target === props.id)
 
   const promptParts = []
+  if (localPrompt.value?.trim()) {
+    promptParts.push({ order: 0, content: localPrompt.value.trim() })
+  }
   let first_frame_image = ''
   let last_frame_image = ''
   const images = [] // input_reference images | 参考图
@@ -315,7 +403,7 @@ const getConnectedInputs = () => {
 
       if (role === 'first_frame_image') {
         first_frame_image = imageData
-      } else if (role === 'last_frame_image') {
+      } else if (role === 'last_frame_image' && supportsLastFrame.value) {
         last_frame_image = imageData
       } else if (role === 'input_reference') {
         images.push(imageData)
@@ -358,7 +446,6 @@ const handleGenerate = async () => {
 
   if (!isModelCompatible.value) {
     const reason = `Model tidak sesuai dengan provider aktif.\nModel: ${localModel.value}\nProvider: ${modelStore.currentProvider}`
-    window.$message?.error('Model tidak sesuai provider')
     showResultModal({ success: false, title: 'Generate video gagal', content: reason })
     isGenerating.value = false
     return
@@ -427,6 +514,10 @@ const handleGenerate = async () => {
       params.dur = localDuration.value
     }
 
+    if (localResolution.value) {
+      params.resolution = localResolution.value
+    }
+
     // 只创建任务，获取 taskId，不在这里轮询
     const { taskId: newTaskId, url } = await createVideoTaskOnly(params)
 
@@ -439,7 +530,6 @@ const handleGenerate = async () => {
         model: localModel.value,
         updatedAt: Date.now()
       })
-      window.$message?.success('Video berhasil dibuat')
       showResultModal({
         success: true,
         title: 'Generate video berhasil',
@@ -456,7 +546,11 @@ const handleGenerate = async () => {
         model: localModel.value,
         updatedAt: Date.now()
       })
-      window.$message?.success('视频任务已创建')
+      showResultModal({
+        success: true,
+        title: 'Task video dibuat',
+        content: `Video sedang diproses\nModel: ${localModel.value}`
+      })
       // Mark this config node as executed | 标记配置节点已执行
       updateNode(props.id, { executed: true, outputNodeId: videoNodeId })
     }
@@ -473,7 +567,6 @@ const handleGenerate = async () => {
       label: 'Gagal membuat video',
       updatedAt: Date.now()
     })
-    window.$message?.error('Gagal membuat video')
     showResultModal({ success: false, title: 'Generate video gagal', content: reason })
   } finally {
     isGenerating.value = false
@@ -520,12 +613,37 @@ onMounted(() => {
     localModel.value = modelStore.selectedVideoModel || availableModels[0]?.key || DEFAULT_VIDEO_MODEL
     updateNode(props.id, { model: localModel.value })
   }
+
+  const config = getModelConfig(localModel.value)
+  const newResOptions = getModelResolutionOptions(localModel.value)
+  if (!localResolution.value) {
+    localResolution.value = config?.defaultResolution || config?.defaultParams?.resolution || newResOptions[0]?.key || ''
+    if (localResolution.value) {
+      updateNode(props.id, { resolution: localResolution.value })
+    }
+  }
+
+  if (props.data?.prompt && !localPrompt.value) {
+    localPrompt.value = props.data.prompt
+  }
 })
 
 // Watch for model changes from props | 监听 props 中模型变化
 watch(() => props.data?.model, (newModel) => {
   if (newModel && newModel !== localModel.value) {
     localModel.value = newModel
+  }
+})
+
+watch(() => props.data?.prompt, (newPrompt) => {
+  if ((newPrompt || '') !== localPrompt.value) {
+    localPrompt.value = newPrompt || ''
+  }
+})
+
+watch(() => props.data?.resolution, (newResolution) => {
+  if ((newResolution || '') !== localResolution.value) {
+    localResolution.value = newResolution || ''
   }
 })
 
@@ -557,7 +675,6 @@ watch(
 
         if (attempt >= 8) {
           const reason = 'Workflow berhenti: input video belum terbaca dari node sebelumnya (prompt/gambar referensi kosong).'
-          window.$message?.warning('Workflow belum berlanjut otomatis')
           showResultModal({ success: false, title: 'Auto-generate video gagal', content: reason })
           return
         }
