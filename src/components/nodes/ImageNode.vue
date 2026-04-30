@@ -3,7 +3,7 @@
   <div class="image-node-wrapper" @mouseenter="showActions = true; showHandleMenu = true" @mouseleave="showActions = false; showHandleMenu = false">
     <!-- Image node | 图片节点 -->
     <div
-      class="image-node bg-[var(--bg-secondary)] rounded-xl border min-w-[200px] max-w-[280px] relative transition-all duration-200"
+      class="image-node bg-[var(--bg-secondary)] rounded-xl border min-w-[190px] w-[min(88vw,280px)] relative transition-all duration-200"
       :class="data.selected ? 'border-1 border-blue-500 shadow-lg shadow-blue-500/20' : 'border border-[var(--border-color)]'">
       <!-- Header | 头部 -->
       <div class="px-3 py-2 border-b border-[var(--border-color)]">
@@ -261,6 +261,8 @@
 
       <!-- Handles | 连接点 -->
       <NodeHandleMenu :nodeId="id" nodeType="image" :visible="showHandleMenu" :operations="operations" @select="handleSelect" />
+      <Handle type="source" :position="Position.Right" id="right-top" class="!bg-[var(--accent-color)]" :style="{ top: '28%' }" />
+      <Handle type="source" :position="Position.Right" id="right-bottom" class="!bg-[var(--accent-color)]" :style="{ top: '72%' }" />
       <Handle type="target" :position="Position.Left" id="left" class="!bg-[var(--accent-color)]" />
     </div>
   </div>

@@ -74,14 +74,14 @@ const orderOptions = computed(() => {
   const connectedTextEdges = edges.value.filter(e => e.target === props.target)
   for (const edge of connectedTextEdges) {
     const sourceNode = nodes.value.find(n => n.id === edge.source)
-    if (sourceNode?.type === 'text') {
+    if (sourceNode?.type === 'text' || sourceNode?.type === 'simplePrompt') {
       const content = sourceNode.data?.content || ''
       // Count @ mentions of image nodes | 统计图片节点的 @ 提及
       const mentionRegex = /@\[([^\]|]+)(?:\|([^\]]+))?\]/g
       let match
       while ((match = mentionRegex.exec(content)) !== null) {
         const mentionedNode = nodes.value.find(n => n.id === match[1])
-        if (mentionedNode?.type === 'image') {
+        if (mentionedNode?.type === 'image' || mentionedNode?.type === 'avatar') {
           mentionedImageCount++
         }
       }

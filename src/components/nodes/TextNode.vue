@@ -3,7 +3,7 @@
   <div class="text-node-wrapper" @mouseenter="showHandleMenu = true" @mouseleave="showHandleMenu = false">
     <!-- Text node | 文本节点 -->
     <div
-      class="text-node bg-[var(--bg-secondary)] rounded-xl border min-w-[280px] max-w-[350px] relative transition-all duration-200"
+      class="text-node bg-[var(--bg-secondary)] rounded-xl border min-w-[230px] w-[min(92vw,350px)] relative transition-all duration-200"
       :class="data.selected ? 'border-1 border-blue-500 shadow-lg shadow-blue-500/20' : 'border border-[var(--border-color)]'">
       <!-- Header | 头部 -->
       <div class="flex items-center justify-between px-3 py-2 border-b border-[var(--border-color)]">
@@ -72,6 +72,8 @@
 
       <!-- Handles | 连接点 -->
       <NodeHandleMenu :nodeId="id" nodeType="text" :visible="showHandleMenu" :operations="operations" @select="handleSelect" />
+      <Handle type="source" :position="Position.Right" id="right-top" class="!bg-[var(--accent-color)]" :style="{ top: '28%' }" />
+      <Handle type="source" :position="Position.Right" id="right-bottom" class="!bg-[var(--accent-color)]" :style="{ top: '72%' }" />
       <Handle type="target" :position="Position.Left" id="left" class="!bg-[var(--accent-color)]" />
 
     </div>
@@ -310,7 +312,7 @@ const convertTextMentionsToChips = () => {
   if (!el) return
 
   // 获取所有可引用的图片节点（需要公开的）
-  const imageNodes = nodes.value.filter(n => n.type === 'image' && n.data?.publicProps?.name)
+  const imageNodes = nodes.value.filter(n => (n.type === 'image' || n.type === 'avatar') && n.data?.publicProps?.name)
   if (imageNodes.length === 0) return
 
   // 快速检查：无 @ 直接跳过
@@ -413,7 +415,7 @@ const editorHtml = computed(() => {
   // 替换 @[nodeId] 为图片
   html = html.replace(/@\[([^\]|]+)(?:\|([^\]]+))?\]/g, (match, nodeId) => {
     const node = nodes.value.find(n => n.id === nodeId)
-    if (node?.type === 'image' && node.data?.url) {
+    if ((node?.type === 'image' || node?.type === 'avatar') && node.data?.url) {
       const displayName = node.data?.publicProps?.name || node.data?.label || '图片'
       return `<span class="mention-inline" data-node-id="${nodeId}"><img src="${node.data.url}" alt="${displayName}" />${displayName}</span>`
     }

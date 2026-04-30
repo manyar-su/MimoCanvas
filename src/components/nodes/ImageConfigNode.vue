@@ -3,7 +3,7 @@
   <div class="image-config-node-wrapper" @mouseenter="showHandleMenu = true" @mouseleave="showHandleMenu = false">
     <!-- Image config node | 文生图配置节点 -->
     <div
-      class="image-config-node bg-[var(--bg-secondary)] rounded-xl border min-w-[300px] transition-all duration-200"
+      class="image-config-node bg-[var(--bg-secondary)] rounded-xl border min-w-[240px] w-[min(92vw,320px)] transition-all duration-200"
       :class="data.selected ? 'border-1 border-blue-500 shadow-lg shadow-blue-500/20' : 'border border-[var(--border-color)]'">
       <!-- Header | 头部 -->
       <div class="flex items-center justify-between px-3 py-2 border-b border-[var(--border-color)]">
@@ -165,7 +165,9 @@
       </div>
 
       <!-- Handles | 连接点 -->
+      <Handle type="target" :position="Position.Left" id="left-top" class="!bg-[var(--accent-color)]" :style="{ top: '28%' }" />
       <Handle type="target" :position="Position.Left" id="left" class="!bg-[var(--accent-color)]" />
+      <Handle type="target" :position="Position.Left" id="left-bottom" class="!bg-[var(--accent-color)]" :style="{ top: '72%' }" />
       <NodeHandleMenu :nodeId="id" nodeType="imageConfig" :visible="showHandleMenu" :operations="operations" @select="handleSelect" />
     </div>
 
@@ -338,7 +340,7 @@ const resolveTextMentionsForImage = (textNode) => {
   const imageMentions = []
   for (const mention of mentions) {
     const referencedNode = nodes.value.find(n => n.id === mention.nodeId)
-    if (referencedNode?.type === 'image') {
+    if (referencedNode?.type === 'image' || referencedNode?.type === 'avatar') {
       const imageData = referencedNode.data?.base64 || referencedNode.data?.url
       if (imageData) {
         imageMentions.push({
@@ -393,7 +395,7 @@ const connectedTextNodeIds = computed(() => {
   const connectedIds = []
   for (const edge of incomingEdges) {
     const sourceNode = nodes.value.find(n => n.id === edge.source)
-    if (sourceNode?.type === 'text') {
+    if (sourceNode?.type === 'text' || sourceNode?.type === 'simplePrompt') {
       connectedIds.push(sourceNode.id)
     }
   }
@@ -404,7 +406,7 @@ const connectedTextNodeIds = computed(() => {
 const getConnectedInputs = () => {
   // 1. First check @ mentions | 首先检查 @ 引用
   // Only check connected TextNodes | 只检查已连接的 TextNode
-  const textNodes = nodes.value.filter(n => n.type === 'text' && connectedTextNodeIds.value.includes(n.id))
+  const textNodes = nodes.value.filter(n => (n.type === 'text' || n.type === 'simplePrompt') && connectedTextNodeIds.value.includes(n.id))
   const mentionsPrompts = []
   const mentionsRefImages = []
 
@@ -439,7 +441,7 @@ const getConnectedInputs = () => {
     const sourceNode = nodes.value.find(n => n.id === edge.source)
     if (!sourceNode) continue
 
-    if (sourceNode.type === 'image') {
+    if (sourceNode.type === 'image' || sourceNode.type === 'avatar') {
       // Prefer base64, fallback to url | 优先使用 base64，回退到 url
       const imageData = sourceNode.data?.base64 || sourceNode.data?.url
       if (imageData) {
@@ -482,7 +484,7 @@ const getConnectedInputs = () => {
     const sourceNode = nodes.value.find(n => n.id === edge.source)
     if (!sourceNode) continue
 
-    if (sourceNode.type === 'text') {
+    if (sourceNode.type === 'text' || sourceNode.type === 'simplePrompt') {
       const content = sourceNode.data?.content || ''
       if (content) {
         // Get order from edge data, default to 1 | 从边数据获取顺序，默认为1
@@ -589,7 +591,7 @@ const findConnectedOutputImageNode = (onlyEmpty = true) => {
   
   for (const edge of outputEdges) {
     const targetNode = nodes.value.find(n => n.id === edge.target)
-    if (targetNode?.type === 'image') {
+    if (targetNode?.type === 'image' || targetNode?.type === 'avatar') {
       if (onlyEmpty) {
         // Check if target is an image node with empty or no url | 检查目标是否为空白图片节点
         if (!targetNode.data?.url || targetNode.data?.url === '') {
@@ -610,7 +612,7 @@ const hasConnectedImageWithContent = computed(() => {
   
   for (const edge of outputEdges) {
     const targetNode = nodes.value.find(n => n.id === edge.target)
-    if (targetNode?.type === 'image' && targetNode.data?.url && targetNode.data.url !== '') {
+    if ((targetNode?.type === 'image' || targetNode?.type === 'avatar') && targetNode.data?.url && targetNode.data.url !== '') {
       return true
     }
   }

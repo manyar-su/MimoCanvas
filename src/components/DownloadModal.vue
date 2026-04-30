@@ -92,7 +92,7 @@ const visible = computed({
 // Get downloadable image assets | 获取可下载的图片素材
 const imageAssets = computed(() => {
   return nodes.value
-    .filter(n => n.type === 'image' && n.data?.url)
+    .filter(n => (n.type === 'image' || n.type === 'avatar') && n.data?.url)
     .map(n => ({
       url: n.data.url,
       label: n.data.label || 'Gambar',

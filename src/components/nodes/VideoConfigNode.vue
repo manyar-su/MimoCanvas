@@ -2,7 +2,7 @@
   <!-- Video config node wrapper | 视频配置节点包裹层 -->
   <div class="video-config-node-wrapper relative" @mouseenter="showHandleMenu = true" @mouseleave="showHandleMenu = false">
     <!-- Video config node | 视频配置节点 -->
-    <div class="video-config-node bg-[var(--bg-secondary)] rounded-xl border min-w-[300px] transition-all duration-200"
+    <div class="video-config-node bg-[var(--bg-secondary)] rounded-xl border min-w-[240px] w-[min(92vw,320px)] transition-all duration-200"
       :class="data.selected ? 'border-1 border-blue-500 shadow-lg shadow-blue-500/20' : 'border border-[var(--border-color)]'">
       <!-- Header | 头部 -->
       <div class="flex items-center justify-between px-3 py-2 border-b border-[var(--border-color)]">
@@ -166,7 +166,9 @@
       </div>
 
       <!-- Handles | 连接点 -->
+      <Handle type="target" :position="Position.Left" id="left-top" class="!bg-[var(--accent-color)]" :style="{ top: '28%' }" />
       <Handle type="target" :position="Position.Left" id="left" class="!bg-[var(--accent-color)]" />
+      <Handle type="target" :position="Position.Left" id="left-bottom" class="!bg-[var(--accent-color)]" :style="{ top: '72%' }" />
       <NodeHandleMenu :nodeId="id" nodeType="videoConfig" :visible="showHandleMenu" :operations="[]" />
     </div>
 
@@ -227,7 +229,7 @@ const connectedImages = computed(() => {
 
   for (const edge of connectedEdges) {
     const sourceNode = nodes.value.find(n => n.id === edge.source)
-    if (sourceNode?.type === 'image' && sourceNode.data?.url) {
+    if ((sourceNode?.type === 'image' || sourceNode?.type === 'avatar') && sourceNode.data?.url) {
       images.push({
         nodeId: sourceNode.id,
         edgeId: edge.id,
@@ -387,7 +389,7 @@ const getConnectedInputs = () => {
     const sourceNode = nodes.value.find(n => n.id === edge.source)
     if (!sourceNode) continue
 
-    if (sourceNode.type === 'text') {
+    if (sourceNode.type === 'text' || sourceNode.type === 'simplePrompt') {
       const content = sourceNode.data?.content || ''
       if (content) {
         promptParts.push({ order: edge.data?.promptOrder || 1, content })
@@ -398,7 +400,7 @@ const getConnectedInputs = () => {
       if (content) {
         promptParts.push({ order: edge.data?.promptOrder || 1, content })
       }
-    } else if (sourceNode.type === 'image' && sourceNode.data?.url) {
+    } else if ((sourceNode.type === 'image' || sourceNode.type === 'avatar') && sourceNode.data?.url) {
       const imageData = sourceNode.data.base64 || sourceNode.data.url
       const role = edge.data?.imageRole || 'first_frame_image'
 

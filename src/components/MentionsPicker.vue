@@ -30,7 +30,7 @@
           @mouseenter="selectedIndex = index"
         >
           <!-- ImageNode 显示图片预览 -->
-          <div v-if="node.type === 'image'" class="mentions-item-image">
+          <div v-if="node.type === 'image' || node.type === 'avatar'" class="mentions-item-image">
             <img v-if="node.data?.url" :src="node.data.url" :alt="node.data.publicProps?.name" />
             <div v-else class="mentions-item-image-placeholder">
               <n-icon :size="20"><ImageOutline /></n-icon>
@@ -43,7 +43,7 @@
           <div class="mentions-item-content">
             <div class="mentions-item-label">
               <!-- ImageNode 优先显示 publicProps.name -->
-              {{ node.type === 'image' ? (node.data?.publicProps?.name || node.data?.label || 'Tanpa nama') : (node.data?.label || node.id) }}
+              {{ (node.type === 'image' || node.type === 'avatar') ? (node.data?.publicProps?.name || node.data?.label || 'Tanpa nama') : (node.data?.label || node.id) }}
             </div>
             <div class="mentions-item-id">{{ node.id }}</div>
           </div>
@@ -112,14 +112,14 @@ const handleShowChange = (val) => {
 // 根据上下文获取可引用的节点类型
 const targetTypes = computed(() => {
   if (props.context === 'llmConfig') {
-    return ['text']
+    return ['text', 'simplePrompt']
   }
-  return ['image']
+  return ['image', 'avatar']
 })
 
 // 检查节点是否公开（仅 ImageNode 需要检查 publicProps.name）
 const isNodePublic = (node) => {
-  if (node.type === 'image') {
+  if (node.type === 'image' || node.type === 'avatar') {
     // ImageNode 需要有 publicProps.name 才算公开
     return node.data?.publicProps?.name && node.data.publicProps.name !== ''
   }
@@ -201,7 +201,9 @@ function handleGlobalKeydown(event) {
 function getNodeIcon(type) {
   const icons = {
     image: '📷',
+    avatar: '🧑',
     text: '📝',
+    simplePrompt: '✍️',
     llmConfig: '🤖',
     imageConfig: '🎨',
     video: '🎬',
@@ -213,7 +215,7 @@ function getNodeIcon(type) {
 // 选择节点
 function selectNode(node) {
   // ImageNode 优先使用 publicProps.name，其他节点使用 label
-  const displayName = node.type === 'image'
+  const displayName = node.type === 'image' || node.type === 'avatar'
     ? (node.data?.publicProps?.name || node.data?.label || node.id)
     : (node.data?.label || node.id)
 

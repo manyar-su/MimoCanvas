@@ -3,7 +3,7 @@
   <div class="video-node-wrapper relative" @mouseenter="showActions = true; showHandleMenu = true" @mouseleave="showActions = false; showHandleMenu = false">
     <!-- Video node | 视频节点 -->
     <div 
-      class="video-node bg-[var(--bg-secondary)] rounded-xl border w-[400px] relative transition-all duration-200"
+      class="video-node bg-[var(--bg-secondary)] rounded-xl border w-[min(92vw,400px)] relative transition-all duration-200"
       :class="data.selected ? 'border-1 border-blue-500 shadow-lg shadow-blue-500/20' : 'border border-[var(--border-color)]'"
       
     >

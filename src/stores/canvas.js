@@ -233,9 +233,10 @@ export const addNodes = (nodeSpecs, autoBatch = true) => {
 const getDefaultNodeData = (type) => {
   switch (type) {
     case 'text':
+    case 'simplePrompt':
       return {
         content: '',
-        label: 'Input teks',
+        label: type === 'simplePrompt' ? 'Simple prompt' : 'Input teks',
         publicProps: {}  // 公共属性（可被 @ 引用）
       }
     case 'imageConfig': {
@@ -265,10 +266,11 @@ const getDefaultNodeData = (type) => {
         label: 'Node video'
       }
     case 'image':
+    case 'avatar':
       return {
         url: '',
-        label: 'Node gambar',
-        publicProps: { name: 'Gambar' }  // 公共属性（可被 @ 引用）
+        label: type === 'avatar' ? 'Avatar output' : 'Node gambar',
+        publicProps: { name: type === 'avatar' ? 'Avatar' : 'Gambar' }  // 公共属性（可被 @ 引用）
       }
     case 'llmConfig':
       return {

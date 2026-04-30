@@ -272,7 +272,9 @@ import {
   RemoveOutline,
   DownloadOutline,
   AppsOutline,
-  ChatbubbleOutline
+  ChatbubbleOutline,
+  CreateOutline,
+  PersonOutline
 } from '@vicons/ionicons5'
 import { nodes, edges, addNode, addNodes, addEdge, addEdges, updateNode, initSampleData, loadProject, saveProject, clearCanvas, canvasViewport, updateViewport, undo, redo, canUndo, canRedo, manualSaveHistory, startBatchOperation, endBatchOperation } from '../stores/canvas'
 import { loadAllModels } from '../stores/models'
@@ -357,9 +359,11 @@ const { viewport, zoomIn, zoomOut, fitView, updateNodeInternals } = useVueFlow()
 // Register custom node types | 注册自定义节点类型
 const nodeTypes = {
   text: markRaw(TextNode),
+  simplePrompt: markRaw(TextNode),
   imageConfig: markRaw(ImageConfigNode),
   video: markRaw(VideoNode),
   image: markRaw(ImageNode),
+  avatar: markRaw(ImageNode),
   videoConfig: markRaw(VideoConfigNode),
   llmConfig: markRaw(LLMConfigNode)
 }
@@ -393,7 +397,7 @@ const renameValue = ref('')
 // Check if has downloadable assets | 检查是否有可下载素材
 const hasDownloadableAssets = computed(() => {
   return nodes.value.some(n => 
-    (n.type === 'image' || n.type === 'video') && n.data?.url
+    (n.type === 'image' || n.type === 'avatar' || n.type === 'video') && n.data?.url
   )
 })
 
@@ -414,7 +418,9 @@ const projectOptions = [
 // Toolbar tools | 工具栏工具
 const tools = [
   { id: 'text', name: 'Teks', icon: TextOutline, action: () => addNewNode('text') },
+  { id: 'simplePrompt', name: 'Simple prompt', icon: CreateOutline, action: () => addNewNode('simplePrompt') },
   { id: 'image', name: 'Gambar', icon: ImageOutline, action: () => addNewNode('image') },
+  { id: 'avatar', name: 'Avatar', icon: PersonOutline, action: () => addNewNode('avatar') },
   { id: 'imageConfig', name: 'Teks ke gambar', icon: ColorPaletteOutline, action: () => addNewNode('imageConfig') },
   { id: 'videoConfig', name: 'Pembuatan video', icon: VideocamOutline, action: () => addNewNode('videoConfig') },
   { id: 'undo', name: 'Urungkan', icon: ArrowUndoOutline, action: () => undo(), disabled: () => !canUndo() },
@@ -424,10 +430,12 @@ const tools = [
 // Node type options for menu | 节点类型菜单选项
 const nodeTypeOptions = [
   { type: 'text', name: 'Node teks', icon: TextOutline, color: '#3b82f6' },
+  { type: 'simplePrompt', name: 'Simple prompt', icon: CreateOutline, color: '#38bdf8' },
   { type: 'llmConfig', name: 'Pembuatan teks LLM', icon: ChatbubbleOutline, color: '#a855f7' },
   { type: 'imageConfig', name: 'Konfigurasi teks ke gambar', icon: ColorPaletteOutline, color: '#22c55e' },
   { type: 'videoConfig', name: 'Konfigurasi video', icon: VideocamOutline, color: '#f59e0b' },
   { type: 'image', name: 'Node gambar', icon: ImageOutline, color: '#8b5cf6' },
+  { type: 'avatar', name: 'Node avatar', icon: PersonOutline, color: '#6366f1' },
   { type: 'video', name: 'Node video', icon: VideocamOutline, color: '#ef4444' }
 ]
 
@@ -522,15 +530,19 @@ const onConnect = (params) => {
   // Check connection types | 检查连接类型
   const sourceNode = nodes.value.find(n => n.id === params.source)
   const targetNode = nodes.value.find(n => n.id === params.target)
-  
-  if (sourceNode?.type === 'image' && targetNode?.type === 'videoConfig') {
+  const sourceType = sourceNode?.type
+  const targetType = targetNode?.type
+  const isImageSource = sourceType === 'image' || sourceType === 'avatar'
+  const isTextSource = sourceType === 'text' || sourceType === 'simplePrompt'
+
+  if (isImageSource && targetType === 'videoConfig') {
     // Use imageRole edge type | 使用图片角色边类型
     addEdge({
       ...params,
       type: 'imageRole',
       data: { imageRole: 'first_frame_image' } // Default to first frame | 默认首帧
     })
-  } else if (sourceNode?.type === 'text' && targetNode?.type === 'imageConfig') {
+  } else if (isTextSource && targetType === 'imageConfig') {
     // Use promptOrder edge type | 使用提示词顺序边类型
     // Calculate next order number | 计算下一个顺序号
     const existingTextEdges = edges.value.filter(e => 
@@ -543,7 +555,7 @@ const onConnect = (params) => {
       type: 'promptOrder',
       data: { promptOrder: nextOrder }
     })
-  } else if (sourceNode?.type === 'image' && targetNode?.type === 'imageConfig') {
+  } else if (isImageSource && targetType === 'imageConfig') {
     // Use imageOrder edge type | 使用图片顺序边类型
     // Calculate next order number | 计算下一个顺序号
     const existingImageEdges = edges.value.filter(e =>
@@ -555,14 +567,14 @@ const onConnect = (params) => {
     const connectedTextEdges = edges.value.filter(e => e.target === params.target)
     for (const edge of connectedTextEdges) {
       const sourceNode = nodes.value.find(n => n.id === edge.source)
-      if (sourceNode?.type === 'text') {
+      if (sourceNode?.type === 'text' || sourceNode?.type === 'simplePrompt') {
         const content = sourceNode.data?.content || ''
         // Count @ mentions of image nodes | 统计图片节点的 @ 提及
         const mentionRegex = /@\[([^\]|]+)(?:\|([^\]]+))?\]/g
         let match
         while ((match = mentionRegex.exec(content)) !== null) {
           const mentionedNode = nodes.value.find(n => n.id === match[1])
-          if (mentionedNode?.type === 'image') {
+          if (mentionedNode?.type === 'image' || mentionedNode?.type === 'avatar') {
             mentionedImageCount++
           }
         }
@@ -577,7 +589,7 @@ const onConnect = (params) => {
       type: 'imageOrder',
       data: { imageOrder: nextOrder }
     })
-  } else if (sourceNode?.type === 'llmConfig' && targetNode?.type === 'imageConfig') {
+  } else if (sourceType === 'llmConfig' && targetType === 'imageConfig') {
     // LLM output as prompt for image generation | LLM 输出作为图片生成提示词
     const existingTextEdges = edges.value.filter(e =>
       e.target === params.target && e.type === 'promptOrder'
@@ -589,7 +601,7 @@ const onConnect = (params) => {
       type: 'promptOrder',
       data: { promptOrder: nextOrder }
     })
-  } else if (sourceNode?.type === 'llmConfig' && targetNode?.type === 'videoConfig') {
+  } else if (sourceType === 'llmConfig' && targetType === 'videoConfig') {
     // LLM output as prompt for video generation | LLM 输出作为视频生成提示词
     addEdge({
       ...params,

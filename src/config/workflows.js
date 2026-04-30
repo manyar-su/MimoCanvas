@@ -808,7 +808,7 @@ Aturan:
           },
           {
             id: refId,
-            type: 'image',
+            type: 'avatar',
             position: { x: startPosition.x, y: laneY },
             data: {
               label: `Reference image ${laneTitle}`,
@@ -817,7 +817,7 @@ Aturan:
           },
           {
             id: avatarPromptId,
-            type: 'text',
+            type: 'simplePrompt',
             position: { x: startPosition.x + colSpacing, y: laneY - 130 },
             data: {
               label: `Simple prompt avatar ${laneTitle}`,
@@ -836,7 +836,7 @@ Aturan:
           },
           {
             id: avatarOutputId,
-            type: 'image',
+            type: 'avatar',
             position: { x: startPosition.x + colSpacing * 2, y: laneY },
             data: {
               label: `Avatar output ${laneTitle}`,
@@ -845,7 +845,7 @@ Aturan:
           },
           {
             id: videoPromptId,
-            type: 'text',
+            type: 'simplePrompt',
             position: { x: startPosition.x + colSpacing * 2, y: laneY - 130 },
             data: {
               label: `Simple prompt video ${laneTitle}`,
@@ -883,7 +883,7 @@ Aturan:
             type: 'promptOrder',
             data: { promptOrder: 1 },
             sourceHandle: 'right',
-            targetHandle: 'left'
+            targetHandle: 'left-top'
           },
           {
             id: `edge_${refId}_${avatarConfigId}`,
@@ -892,7 +892,7 @@ Aturan:
             type: 'imageOrder',
             data: { imageOrder: 1 },
             sourceHandle: 'right',
-            targetHandle: 'left'
+            targetHandle: 'left-bottom'
           },
           { id: `edge_${avatarConfigId}_${avatarOutputId}`, source: avatarConfigId, target: avatarOutputId, sourceHandle: 'right', targetHandle: 'left' },
           {
@@ -902,7 +902,7 @@ Aturan:
             type: 'promptOrder',
             data: { promptOrder: 1 },
             sourceHandle: 'right',
-            targetHandle: 'left'
+            targetHandle: 'left-top'
           },
           {
             id: `edge_${avatarOutputId}_${videoConfigId}`,
@@ -911,7 +911,7 @@ Aturan:
             type: 'imageRole',
             data: { imageRole: 'first_frame_image' },
             sourceHandle: 'right',
-            targetHandle: 'left'
+            targetHandle: 'left-bottom'
           },
           { id: `edge_${videoConfigId}_${videoOutputId}`, source: videoConfigId, target: videoOutputId, sourceHandle: 'right', targetHandle: 'left' }
         )
@@ -926,7 +926,7 @@ Aturan:
       createLane(
         1,
         'B',
-        'Perempuan menatap kamera dengan hangat, menyampaikan ajakan singkat untuk live, gaya influencer UGC, potrait 9:16, tanpa teks overlay, kualitas video bersih.'
+        'Perempuan menatap kamera dengan hangat, menyampaikan ajakan singkat untuk live, gaya influencer UGC, portrait 9:16, tanpa teks overlay, kualitas video bersih.'
       )
 
       return { nodes, edges }
