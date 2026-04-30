@@ -40,7 +40,13 @@
         <!-- Model selector | 模型选择 -->
         <div class="flex items-center justify-between">
           <span class="text-xs text-[var(--text-secondary)]">Model</span>
-          <n-dropdown :options="modelOptions" @select="handleModelSelect">
+          <n-dropdown
+            :options="modelOptions"
+            :width="220"
+            content-class="video-model-dropdown-popover"
+            :menu-props="{ class: 'video-model-dropdown-menu' }"
+            @select="handleModelSelect"
+          >
             <button class="flex items-center gap-1 text-sm text-[var(--text-primary)] hover:text-[var(--accent-color)]">
               {{ displayModelName }}
               <n-icon :size="12"><ChevronDownOutline /></n-icon>
@@ -263,8 +269,8 @@ const modelOptions = computed(() => {
     const disabledByFlow = hasFirstFrameConnected.value ? !caps.supportsI2V : false
     const disabled = disabledByProvider || disabledByFlow
     const reason = disabledByProvider
-      ? 'provider tidak cocok'
-      : (disabledByFlow ? 'tidak support image→video' : '')
+      ? 'no provider'
+      : (disabledByFlow ? 'no i2v' : '')
     return {
       label: reason ? `${m.label} (${reason})` : m.label,
       key: m.key,
@@ -276,13 +282,8 @@ const isModelCompatible = computed(() => modelStore.availableVideoModels.some(m 
 
 // Display model name | 显示模型名称
 const displayModelName = computed(() => {
-  const model = modelOptions.value.find(m => m.key === localModel.value)
-  // 如果当前模型不在选项中，尝试从 allVideoModels 找到
-  if (!model) {
-    const allModel = modelStore.allVideoModels.find(m => m.key === localModel.value)
-    return allModel?.label || localModel.value || '选择模型'
-  }
-  return model?.label || localModel.value || '选择模型'
+  const allModel = modelStore.allVideoModels.find(m => m.key === localModel.value)
+  return allModel?.label || localModel.value || 'Pilih model'
 })
 
 // Ratio options based on model | 基于模型的比例选项
@@ -698,5 +699,22 @@ watch(
 .video-config-node {
   cursor: default;
   position: relative;
+}
+
+:deep(.video-model-dropdown-popover) {
+  width: 220px !important;
+  max-width: 220px !important;
+}
+
+:deep(.video-model-dropdown-menu .n-dropdown-option-body) {
+  max-width: 200px;
+}
+
+:deep(.video-model-dropdown-menu .n-dropdown-option-body__label) {
+  display: block;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
