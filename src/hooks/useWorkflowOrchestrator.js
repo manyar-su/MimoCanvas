@@ -382,10 +382,10 @@ export const useWorkflowOrchestrator = () => {
     const nodeSpacing = 400
     const rowSpacing = 200
     let x = position.x
-    
+
     addLog('info', '开始执行文生图生视频工作流')
     currentStep.value = 1
-    totalSteps.value = 5
+    totalSteps.value = 4
     
     // Step 1: Create image prompt text node | 创建图片提示词节点
     const imageTextNodeId = addNode('text', { x, y: position.y }, {
@@ -394,17 +394,8 @@ export const useWorkflowOrchestrator = () => {
     })
     addLog('info', `创建图片提示词节点: ${imageTextNodeId}`)
     
-    // Step 2: Create video prompt text node (below image prompt) | 创建视频提示词节点
+    // Step 2: Create imageConfig with autoExecute | 创建图片配置节点
     currentStep.value = 2
-    const videoTextNodeId = addNode('text', { x, y: position.y + rowSpacing }, {
-      content: videoPrompt,
-      label: '视频提示词'
-    })
-    addLog('info', `创建视频提示词节点: ${videoTextNodeId}`)
-    x += nodeSpacing
-    
-    // Step 3: Create imageConfig with autoExecute | 创建图片配置节点
-    currentStep.value = 3
     const imageConfigId = addNode('imageConfig', { x, y: position.y }, {
       label: '文生图',
       autoExecute: true
@@ -435,23 +426,14 @@ export const useWorkflowOrchestrator = () => {
       x = (imageNode?.position?.x || x) + nodeSpacing
       
       // Step 4: Create videoConfig connected to videoText and image nodes
-      // 创建视频配置节点，连接视频提示词和图片节点
+      // 创建视频配置节点，直接写入 prompt 并连接图片节点
       currentStep.value = 4
       const videoConfigId = addNode('videoConfig', { x, y: position.y + rowSpacing }, {
         label: '图生视频',
+        prompt: videoPrompt || '',
         autoExecute: true
       })
       addLog('info', `创建视频配置节点: ${videoConfigId}`)
-      
-      // Connect videoText → videoConfig (for video prompt)
-      addEdge({
-        source: videoTextNodeId,
-        target: videoConfigId,
-        type: 'promptOrder',
-        data: { promptOrder: 1 },
-        sourceHandle: 'right',
-        targetHandle: 'left'
-      })
 
       // Connect image → videoConfig (for image input)
       addEdge({
@@ -462,9 +444,9 @@ export const useWorkflowOrchestrator = () => {
         sourceHandle: 'right',
         targetHandle: 'left'
       })
-      
+
       addLog('success', '文生图生视频工作流已启动')
-      return { imageTextNodeId, videoTextNodeId, imageConfigId, imageNodeId, videoConfigId }
+      return { imageTextNodeId, imageConfigId, imageNodeId, videoConfigId }
     } catch (err) {
       addLog('error', `工作流执行失败: ${err.message}`)
       throw err
