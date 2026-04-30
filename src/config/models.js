@@ -89,6 +89,7 @@ export const CHAT_MODELS = [
   { label: 'GPT-4o Mini', key: 'gpt-4o-mini', provider: ['openai'] },
   { label: 'GPT-4o', key: 'gpt-4o', provider: ['openai'] },
   { label: 'GPT-5.2', key: 'gpt-5.2', provider: ['openai'] },
+  { label: 'ChatGPT 5.4', key: 'gpt-5.4', provider: ['openai'] },
   { label: 'Runpod OpenAI-Compatible Model', key: 'your-runpod-model', provider: ['runpodChat'] },
   { label: 'DeepSeek Chat', key: 'deepseek-chat', provider: ['openai', 'chatfire'] },
   { label: 'Sumopod OpenAI-Compatible Model', key: 'your-sumopod-model', provider: ['sumopod'] },
