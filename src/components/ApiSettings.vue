@@ -62,7 +62,7 @@
             <div class="flex flex-col gap-2">
               <p>Atur API Key untuk menggunakan fitur AI</p>
               <a 
-                href="https://api.chatfire.site/login?inviteCode=EEE80324" 
+                href="" 
                 target="_blank"
                 class="text-[var(--accent-color)] hover:underline text-sm flex items-center gap-1"
               >
@@ -195,7 +195,7 @@
     <template #footer>
       <div class="flex justify-between items-center">
         <a 
-          href="https://api.chatfire.site/login?inviteCode=EEE80324" 
+          href="" 
           target="_blank"
           class="text-xs text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors"
         >
