@@ -38,8 +38,11 @@ const STORAGE_KEYS = {
 }
 
 const DEFAULT_API_KEYS = {
-  runpodImage: '',
-  runpodChat: ''
+  runpodImage: import.meta.env.VITE_RUNPOD_API_KEY || '',
+  runpodChat: import.meta.env.VITE_RUNPOD_API_KEY || '',
+  chatfire: import.meta.env.VITE_CHATFIRE_API_KEY || '',
+  openai: import.meta.env.VITE_OPENAI_API_KEY || '',
+  sumopod: import.meta.env.VITE_SUMOPOD_API_KEY || ''
 }
 
 /**
