@@ -187,6 +187,7 @@ import NodeHandleMenu from './NodeHandleMenu.vue'
 import { useModelStore } from '../../stores/pinia'
 import { getModelSizeOptions, getModelQualityOptions, getModelConfig, DEFAULT_IMAGE_MODEL } from '../../stores/models'
 import { parseMentions } from '../../hooks/useNodeRef'
+import { buildFailureReason, showResultModal } from '../../utils/notify'
 
 // 使用 Pinia store 获取模型选项（根据渠道过滤）
 const modelStore = useModelStore()
@@ -264,6 +265,8 @@ const modelOptions = computed(() => {
     })
     .map((m) => ({ label: m.label, key: m.key }))
 })
+
+const isModelCompatible = computed(() => modelStore.availableImageModels.some(m => m.key === localModel.value))
 
 // Display model name | 显示模型名称
 const displayModelName = computed(() => {
@@ -647,6 +650,13 @@ const handleGenerate = async (mode = 'auto') => {
     return
   }
 
+  if (!isModelCompatible.value) {
+    const reason = `Model tidak sesuai dengan provider aktif.\nModel: ${localModel.value}\nProvider: ${modelStore.currentProvider}`
+    window.$message?.error('Model tidak sesuai provider')
+    showResultModal({ success: false, title: 'Generate gambar gagal', content: reason })
+    return
+  }
+
   let imageNodeId = null
   
   if (mode === 'replace') {
@@ -733,14 +743,25 @@ const handleGenerate = async (mode = 'auto') => {
       updateNode(props.id, { executed: true, outputNodeId: imageNodeId })
     }
     window.$message?.success('Gambar berhasil dibuat')
+    showResultModal({
+      success: true,
+      title: 'Generate gambar berhasil',
+      content: `Model: ${localModel.value}\nProvider: ${modelStore.currentProvider}`
+    })
   } catch (err) {
+    const reason = buildFailureReason(err, {
+      model: localModel.value,
+      provider: modelStore.currentProvider
+    })
+
     // Update node to show error | 更新节点显示错误
     updateNode(imageNodeId, {
       loading: false,
-      error: err.message || 'Gagal membuat gambar',
+      error: reason,
       updatedAt: Date.now()
     })
-    window.$message?.error(err.message || 'Gagal membuat gambar')
+    window.$message?.error('Gagal membuat gambar')
+    showResultModal({ success: false, title: 'Generate gambar gagal', content: reason })
   }
 }
 

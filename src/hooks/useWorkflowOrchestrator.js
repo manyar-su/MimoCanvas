@@ -447,14 +447,18 @@ export const useWorkflowOrchestrator = () => {
       addEdge({
         source: videoTextNodeId,
         target: videoConfigId,
+        type: 'promptOrder',
+        data: { promptOrder: 1 },
         sourceHandle: 'right',
         targetHandle: 'left'
       })
-      
+
       // Connect image → videoConfig (for image input)
       addEdge({
         source: imageNodeId,
         target: videoConfigId,
+        type: 'imageRole',
+        data: { imageRole: 'first_frame_image' },
         sourceHandle: 'right',
         targetHandle: 'left'
       })

@@ -147,6 +147,7 @@ import { TrashOutline, ExpandOutline, VideocamOutline, CopyOutline, CloseCircleO
 import { updateNode, removeNode, duplicateNode, addNode, addEdge, nodes } from '../../stores/canvas'
 import { useVideoGeneration } from '../../hooks/useApi'
 import NodeHandleMenu from './NodeHandleMenu.vue'
+import { buildFailureReason, showResultModal } from '../../utils/notify'
 
 const props = defineProps({
   id: String,
@@ -214,15 +215,18 @@ const startPolling = async (taskId) => {
       taskId: null  // 清除 taskId
     })
     window.$message?.success('视频生成成功')
+    showResultModal({ success: true, title: 'Generate video berhasil', content: 'Video selesai diproses dan siap dipreview.' })
   } catch (err) {
+    const reason = buildFailureReason(err, { model: props.data?.model })
     // 轮询失败
     updateNode(props.id, {
       loading: false,
-      error: err.message || '生成失败',
+      error: reason,
       label: '生成失败',
       taskId: null  // 清除 taskId
     })
-    window.$message?.error(err.message || '视频生成失败')
+    window.$message?.error('Video gagal diproses')
+    showResultModal({ success: false, title: 'Generate video gagal', content: reason })
   } finally {
     isPolling.value = false
   }

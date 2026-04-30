@@ -152,6 +152,7 @@ import { updateNode, removeNode, duplicateNode, addNode, addEdge, nodes, edges }
 import NodeHandleMenu from './NodeHandleMenu.vue'
 import { useModelStore } from '../../stores/pinia'
 import { getModelRatioOptions, getModelDurationOptions, getModelConfig, DEFAULT_VIDEO_MODEL } from '../../stores/models'
+import { buildFailureReason, showResultModal } from '../../utils/notify'
 
 // 使用 Pinia store 获取模型选项（根据渠道过滤）
 const modelStore = useModelStore()
@@ -221,6 +222,7 @@ const currentModelConfig = computed(() => getModelConfig(localModel.value))
 
 // Model options from Pinia store (filtered by provider) | 从 Pinia store 获取模型选项（根据渠道过滤）
 const modelOptions = computed(() => modelStore.allVideoModelOptions)
+const isModelCompatible = computed(() => modelStore.availableVideoModels.some(m => m.key === localModel.value))
 
 // Display model name | 显示模型名称
 const displayModelName = computed(() => {
@@ -354,6 +356,14 @@ const handleGenerate = async () => {
     return
   }
 
+  if (!isModelCompatible.value) {
+    const reason = `Model tidak sesuai dengan provider aktif.\nModel: ${localModel.value}\nProvider: ${modelStore.currentProvider}`
+    window.$message?.error('Model tidak sesuai provider')
+    showResultModal({ success: false, title: 'Generate video gagal', content: reason })
+    isGenerating.value = false
+    return
+  }
+
   // Get current node position | 获取当前节点位置
   const currentNode = nodes.value.find(n => n.id === props.id)
   const nodeX = currentNode?.position?.x || 0
@@ -430,6 +440,11 @@ const handleGenerate = async () => {
         updatedAt: Date.now()
       })
       window.$message?.success('Video berhasil dibuat')
+      showResultModal({
+        success: true,
+        title: 'Generate video berhasil',
+        content: `Model: ${localModel.value}\nProvider: ${modelStore.currentProvider}`
+      })
       // Mark this config node as executed | 标记配置节点已执行
       updateNode(props.id, { executed: true, outputNodeId: videoNodeId })
     } else if (newTaskId) {
@@ -446,14 +461,20 @@ const handleGenerate = async () => {
       updateNode(props.id, { executed: true, outputNodeId: videoNodeId })
     }
   } catch (err) {
+    const reason = buildFailureReason(err, {
+      model: localModel.value,
+      provider: modelStore.currentProvider
+    })
+
     // Update node to show error | 更新节点显示错误
     updateNode(videoNodeId, {
       loading: false,
-      error: err.message || 'Gagal membuat video',
+      error: reason,
       label: 'Gagal membuat video',
       updatedAt: Date.now()
     })
-    window.$message?.error(err.message || 'Gagal membuat video')
+    window.$message?.error('Gagal membuat video')
+    showResultModal({ success: false, title: 'Generate video gagal', content: reason })
   } finally {
     isGenerating.value = false
   }
@@ -523,10 +544,28 @@ watch(
     if (shouldExecute && !loading.value) {
       // Clear the flag first to prevent re-triggering | 先清除标志防止重复触发
       updateNode(props.id, { autoExecute: false })
-      // Delay to ensure node connections are established | 延迟确保节点连接已建立
-      setTimeout(() => {
-        handleGenerate()
-      }, 100)
+
+      // Retry to ensure edge/image reference is already connected | 重试确保引用图连线已就绪
+      const triggerWithRetry = (attempt = 0) => {
+        const { prompt, first_frame_image, last_frame_image, images } = getConnectedInputs()
+        const hasInput = !!(prompt || first_frame_image || last_frame_image || images.length > 0)
+
+        if (hasInput) {
+          handleGenerate()
+          return
+        }
+
+        if (attempt >= 8) {
+          const reason = 'Workflow berhenti: input video belum terbaca dari node sebelumnya (prompt/gambar referensi kosong).'
+          window.$message?.warning('Workflow belum berlanjut otomatis')
+          showResultModal({ success: false, title: 'Auto-generate video gagal', content: reason })
+          return
+        }
+
+        setTimeout(() => triggerWithRetry(attempt + 1), 250)
+      }
+
+      setTimeout(() => triggerWithRetry(0), 150)
     }
   },
   { immediate: true }
